@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { art } from '../art';
+import { HEXAGRAMS, type Hexagram } from '../data/iching';
+import { MO_READINGS, MO_SYLLABLES } from '../data/mo';
 import { COFFEE_SYMBOLS, MAGIC_BALL_ANSWERS, type CoffeeSymbol } from '../data/oracles';
 import { splitReading, TAROT_CARDS, tarotArtKey, type TarotCard } from '../data/tarot';
 import type { Character, SystemId } from '../data/types';
@@ -136,11 +138,74 @@ function Coffee({ onReveal, onClose }: OracleProps) {
   );
 }
 
+/** Шість ліній гексаграми знизу вгору: суцільна — ян, перервана — інь. */
+function HexagramLines({ lines }: { lines: number[] }) {
+  return (
+    <svg className="hexagram" viewBox="0 0 100 88" role="img" aria-label="Гексаграма">
+      {[...lines].reverse().map((yang, i) => (
+        <g key={i} transform={`translate(0 ${i * 15.2})`}>
+          {yang ? (
+            <rect width="100" height="10" rx="3" />
+          ) : (
+            <>
+              <rect width="42" height="10" rx="3" />
+              <rect x="58" width="42" height="10" rx="3" />
+            </>
+          )}
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function IChing({ onReveal, onClose }: OracleProps) {
+  return (
+    <RevealOracle<Hexagram>
+      label="І-Цзин"
+      roll={() => pick(HEXAGRAMS)}
+      onReveal={onReveal}
+      onClose={onClose}
+      back={<Img name="i-tsin/flip_a_coin" className="coin" />}
+      result={(h) => (
+        <>
+          <HexagramLines lines={h.lines} />
+          <h2 className="result-title">№ {h.n} · {h.name}</h2>
+          <p className="result-text">{h.text}</p>
+        </>
+      )}
+    />
+  );
+}
+
+function Mo({ onReveal, onClose }: OracleProps) {
+  return (
+    <RevealOracle<[number, number]>
+      label="Тибетське ворожіння МО"
+      roll={() => [Math.floor(Math.random() * 6), Math.floor(Math.random() * 6)]}
+      onReveal={onReveal}
+      onClose={onClose}
+      back={<Img name="mo/mo_back" className="dice-back" />}
+      result={([a, b]) => (
+        <>
+          <div className="dice">
+            <Img name={`mo/${MO_SYLLABLES[a].id}`} className="die" />
+            <Img name={`mo/${MO_SYLLABLES[b].id}`} className="die" />
+          </div>
+          <h2 className="result-title">{MO_SYLLABLES[a].label} · {MO_SYLLABLES[b].label}</h2>
+          <p className="result-text">{MO_READINGS[a][b]}</p>
+        </>
+      )}
+    />
+  );
+}
+
 export function Oracle({ system, ...props }: OracleProps & { system: SystemId }) {
   switch (system) {
     case 'tarot': return <Tarot {...props} />;
     case 'ball': return <Ball {...props} />;
     case 'coffee': return <Coffee {...props} />;
+    case 'iching': return <IChing {...props} />;
+    case 'mo': return <Mo {...props} />;
     default: return null;
   }
 }

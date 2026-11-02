@@ -13,7 +13,7 @@ export const SYSTEM_LABELS: Record<SystemId, string> = {
 export const SYSTEM_ORDER: SystemId[] = ['tarot', 'ball', 'coffee', 'iching', 'mo', 'astro'];
 
 /** Системи, які вже працюють. Решта з'являться в меню по мірі готовності. */
-export const READY_SYSTEMS: SystemId[] = ['tarot', 'ball', 'coffee'];
+export const READY_SYSTEMS: SystemId[] = ['tarot', 'ball', 'coffee', 'iching', 'mo'];
 
 export const babka: Character = {
   id: 'babka',

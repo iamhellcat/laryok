@@ -305,8 +305,7 @@ button {
   50% { transform: scale(1.08); }
 }
 
-.reveal > img,
-.reveal > .ball {
+.reveal > :is(img, .ball, .dice, .hexagram) {
   animation: reveal 0.45s cubic-bezier(0.2, 1.3, 0.4, 1);
 }
 @keyframes reveal {
@@ -325,6 +324,32 @@ button {
   display: block;
   width: 72cqw;
   height: auto;
+}
+.coin {
+  display: block;
+  width: 56cqw;
+  height: auto;
+}
+.dice-back {
+  display: block;
+  width: 76cqw;
+  height: auto;
+}
+.dice {
+  display: flex;
+  justify-content: center;
+  gap: 5cqw;
+}
+.die {
+  display: block;
+  width: 31cqw;
+  height: auto;
+}
+.hexagram {
+  display: block;
+  width: 42cqw;
+  height: auto;
+  fill: var(--line);
 }
 .ball {
   position: relative;
