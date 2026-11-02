@@ -1,0 +1,377 @@
+@font-face {
+  font-family: 'Sofia Sans Extra Condensed';
+  src: url('/fonts/SofiaSansExtraCondensed.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Gothic A1';
+  src: url('/fonts/GothicA1-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Gothic A1';
+  src: url('/fonts/GothicA1-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --ink: #3b2f2a;
+  --line: #4b3a33;
+  --pink: #eed0c9;
+  --blue: #cce6ea;
+  --paper: #f0fafb;
+  --red: #a64e38;
+  --sky: #9dbfd3;
+  --ground: #a38856;
+  --head: 'Sofia Sans Extra Condensed', 'Arial Narrow', sans-serif;
+  --body: 'Gothic A1', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: linear-gradient(var(--sky) 0 60%, var(--ground) 60%);
+  color: var(--ink);
+  font-family: var(--body);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ---------- сцена ---------- */
+
+.stage {
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+  width: 100vw;
+}
+
+.scene {
+  --h: min(100dvh, calc(100vw * 2622 / 1206));
+  position: relative;
+  height: var(--h);
+  width: calc(var(--h) * 1206 / 2622);
+  container-type: inline-size;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.layer {
+  position: absolute;
+  display: block;
+  height: auto;
+  pointer-events: none;
+}
+
+.kiosk-hit {
+  position: absolute;
+  z-index: 5;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.kiosk-hit:focus-visible {
+  outline: 0.8cqw dashed var(--red);
+  outline-offset: -1cqw;
+}
+
+/* ---------- птах ---------- */
+
+.bird {
+  position: absolute;
+  pointer-events: none;
+  animation: fly 26s linear forwards;
+}
+.bird-body {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform-origin: 60% 60%;
+  animation: flap 3.1s ease-in-out infinite;
+}
+@keyframes fly {
+  from { transform: translateX(var(--from)); }
+  to { transform: translateX(var(--to)); }
+}
+@keyframes flap {
+  0% { transform: translateY(0) rotate(calc(var(--seed) * 1deg)); }
+  22% { transform: translateY(-14%) rotate(-7deg); }
+  41% { transform: translateY(4%) rotate(5deg); }
+  63% { transform: translateY(-9%) rotate(-3deg); }
+  100% { transform: translateY(0) rotate(calc(var(--seed) * 1deg)); }
+}
+
+/* ---------- лічильник монет ---------- */
+
+.coins {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+}
+.coins img {
+  display: block;
+  width: 100%;
+}
+.coins-count {
+  position: absolute;
+  left: 8%;
+  width: 56%;
+  top: 50%;
+  transform: translateY(-54%);
+  text-align: center;
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 8cqw;
+  line-height: 1;
+}
+
+/* ---------- рамки ---------- */
+
+.frame {
+  position: absolute;
+  z-index: 21;
+  background: var(--pink);
+  border: 0.9cqw solid var(--line);
+  border-radius: 3.4cqw 2.6cqw 3.8cqw 2.8cqw / 2.8cqw 3.6cqw 2.6cqw 3.4cqw;
+  box-shadow: 0 1cqw 0 rgb(75 58 51 / 0.28);
+  animation: pop-in 0.22s ease-out;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+.backdrop.dim {
+  background: rgb(40 30 25 / 0.38);
+}
+
+.close {
+  position: absolute;
+  top: 1.6cqw;
+  right: 2cqw;
+  z-index: 2;
+  width: 8cqw;
+  height: 8cqw;
+  padding: 0;
+  border: 0.6cqw solid var(--line);
+  border-radius: 50%;
+  background: var(--blue);
+  font-size: 5.4cqw;
+  line-height: 1;
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(2cqw) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- пуш про монети ---------- */
+
+.push {
+  z-index: 31;
+  left: 8cqw;
+  right: 8cqw;
+  top: 80%;
+  padding: 3.4cqw 5cqw 3.8cqw;
+  text-align: center;
+}
+.push h2 {
+  margin: 0;
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 10cqw;
+  line-height: 1;
+  color: var(--red);
+}
+.push p {
+  margin: 1.4cqw 0 0;
+  font-size: 4.2cqw;
+  line-height: 1.3;
+}
+
+/* ---------- діалог ---------- */
+
+.dialog {
+  left: 4cqw;
+  right: 4cqw;
+  bottom: 4cqw;
+  padding: 4.5cqw 4.5cqw 3cqw;
+}
+.say {
+  margin: 0 8cqw 3cqw 0;
+  font-size: 4.9cqw;
+  font-weight: 700;
+  line-height: 1.28;
+  animation: pop-in 0.25s ease-out;
+}
+.replies {
+  display: grid;
+  gap: 2cqw;
+}
+.reply {
+  width: 100%;
+  padding: 2.3cqw 3.4cqw;
+  border: 0.6cqw solid var(--line);
+  border-radius: 2.6cqw 2cqw 2.8cqw 2.2cqw / 2.2cqw 2.8cqw 2cqw 2.6cqw;
+  background: var(--blue);
+  font-size: 3.9cqw;
+  line-height: 1.25;
+  text-align: left;
+  box-shadow: 0 0.7cqw 0 rgb(75 58 51 / 0.3);
+  transition: transform 0.08s, box-shadow 0.08s, background 0.12s;
+}
+.reply:hover {
+  background: var(--paper);
+}
+.reply:active {
+  transform: translateY(0.6cqw);
+  box-shadow: none;
+}
+
+/* ---------- ворожіння ---------- */
+
+.oracle {
+  inset: 6cqw 5cqw auto;
+  max-height: calc(100% - 12cqw);
+  overflow-y: auto;
+  padding: 6cqw 5cqw 5cqw;
+  background: var(--paper);
+}
+.oracle-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: center;
+}
+.tick-target img {
+  transition: transform 0.15s;
+}
+.tick-target:hover img {
+  transform: scale(1.02) rotate(-1deg);
+}
+.tick {
+  margin-top: 4cqw;
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 14cqw;
+  line-height: 1;
+  color: var(--red);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  50% { transform: scale(1.08); }
+}
+
+.reveal > img,
+.reveal > .ball {
+  animation: reveal 0.45s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+@keyframes reveal {
+  from { opacity: 0; transform: scale(0.6) rotate(-6deg); }
+  to { opacity: 1; transform: none; }
+}
+
+.card {
+  display: block;
+  width: 50cqw;
+  height: auto;
+  border-radius: 2.2cqw;
+  box-shadow: 0 1cqw 2cqw rgb(40 30 25 / 0.3);
+}
+.cup {
+  display: block;
+  width: 72cqw;
+  height: auto;
+}
+.ball {
+  position: relative;
+  display: block;
+  width: 76cqw;
+  height: auto;
+  container-type: inline-size;
+}
+.ball img {
+  display: block;
+  width: 100%;
+}
+.ball-answer {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  font-family: var(--head);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  text-wrap: balance;
+  color: #e6f3ff;
+}
+
+.result-title {
+  margin: 3.4cqw 0 0;
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 9cqw;
+  line-height: 1;
+  color: var(--red);
+}
+.result-text {
+  margin: 2cqw 0 0;
+  font-size: 4cqw;
+  line-height: 1.38;
+}
+.symbol {
+  width: 100%;
+  margin: 3cqw 0 0;
+  font-size: 4.2cqw;
+  line-height: 1.35;
+}
+.symbol b {
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 6cqw;
+  color: var(--red);
+}
+.done {
+  width: auto;
+  margin-top: 4.4cqw;
+  padding-inline: 8cqw;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,326 @@
+{
+ "canvas": {
+  "w": 1206,
+  "h": 2622
+ },
+ "art": {
+  "characters/babka/babka_grumpy": {
+   "src": "/art/characters/babka/babka_grumpy.webp",
+   "x": 440,
+   "y": 1237,
+   "w": 324,
+   "h": 430
+  },
+  "characters/babka/babka_happy": {
+   "src": "/art/characters/babka/babka_happy.webp",
+   "x": 440,
+   "y": 1237,
+   "w": 324,
+   "h": 429
+  },
+  "characters/babka/babka_neutral": {
+   "src": "/art/characters/babka/babka_neutral.webp",
+   "x": 440,
+   "y": 1237,
+   "w": 324,
+   "h": 429
+  },
+  "characters/cat/cat_happy": {
+   "src": "/art/characters/cat/cat_happy.webp",
+   "x": 492,
+   "y": 1334,
+   "w": 278,
+   "h": 245
+  },
+  "characters/cat/cat_neutral": {
+   "src": "/art/characters/cat/cat_neutral.webp",
+   "x": 492,
+   "y": 1334,
+   "w": 278,
+   "h": 245
+  },
+  "characters/student/student_happy": {
+   "src": "/art/characters/student/student_happy.webp",
+   "x": 463,
+   "y": 1241,
+   "w": 279,
+   "h": 339
+  },
+  "characters/student/student_neutral": {
+   "src": "/art/characters/student/student_neutral.webp",
+   "x": 463,
+   "y": 1241,
+   "w": 279,
+   "h": 339
+  },
+  "characters/student/student_sad": {
+   "src": "/art/characters/student/student_sad.webp",
+   "x": 463,
+   "y": 1241,
+   "w": 279,
+   "h": 339
+  },
+  "coffee/coffee_button": {
+   "src": "/art/coffee/coffee_button.webp",
+   "x": 882,
+   "y": 1390,
+   "w": 149,
+   "h": 137
+  },
+  "coffee/cup": {
+   "src": "/art/coffee/cup.webp",
+   "x": 302,
+   "y": 1062,
+   "w": 637,
+   "h": 548
+  },
+  "coffee/cup_back": {
+   "src": "/art/coffee/cup_back.webp",
+   "x": 302,
+   "y": 1062,
+   "w": 637,
+   "h": 548
+  },
+  "i-tsin/flip_a_coin": {
+   "src": "/art/i-tsin/flip_a_coin.webp",
+   "x": 429,
+   "y": 1842,
+   "w": 327,
+   "h": 332
+  },
+  "i-tsin/i_tsin_batton": {
+   "src": "/art/i-tsin/i_tsin_batton.webp",
+   "x": 847,
+   "y": 1239,
+   "w": 227,
+   "h": 141
+  },
+  "mo/mo_back": {
+   "src": "/art/mo/mo_back.webp",
+   "x": 307,
+   "y": 1469,
+   "w": 593,
+   "h": 252
+  },
+  "mo/ah": {
+   "src": "/art/mo/ah.webp",
+   "x": 480,
+   "y": 1839,
+   "w": 240,
+   "h": 250
+  },
+  "mo/dhi": {
+   "src": "/art/mo/dhi.webp",
+   "x": 480,
+   "y": 1839,
+   "w": 240,
+   "h": 250
+  },
+  "mo/na": {
+   "src": "/art/mo/na.webp",
+   "x": 480,
+   "y": 1839,
+   "w": 240,
+   "h": 250
+  },
+  "mo/pa": {
+   "src": "/art/mo/pa.webp",
+   "x": 480,
+   "y": 1839,
+   "w": 240,
+   "h": 250
+  },
+  "mo/ra": {
+   "src": "/art/mo/ra.webp",
+   "x": 480,
+   "y": 1839,
+   "w": 240,
+   "h": 250
+  },
+  "mo/tsa": {
+   "src": "/art/mo/tsa.webp",
+   "x": 480,
+   "y": 1839,
+   "w": 240,
+   "h": 250
+  },
+  "tarot/tarot_button": {
+   "src": "/art/tarot/tarot_button.webp",
+   "x": 141,
+   "y": 1077,
+   "w": 200,
+   "h": 197
+  },
+  "tarot/tarot_chariot": {
+   "src": "/art/tarot/tarot_chariot.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_death": {
+   "src": "/art/tarot/tarot_death.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_deck": {
+   "src": "/art/tarot/tarot_deck.webp",
+   "w": 600,
+   "h": 986
+  },
+  "tarot/tarot_devil": {
+   "src": "/art/tarot/tarot_devil.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_emperor": {
+   "src": "/art/tarot/tarot_emperor.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_empress": {
+   "src": "/art/tarot/tarot_empress.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_fool": {
+   "src": "/art/tarot/tarot_fool.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_hanged_man": {
+   "src": "/art/tarot/tarot_hanged_man.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_hermit": {
+   "src": "/art/tarot/tarot_hermit.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_judgement": {
+   "src": "/art/tarot/tarot_judgement.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_justice": {
+   "src": "/art/tarot/tarot_justice.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_lovers": {
+   "src": "/art/tarot/tarot_lovers.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_magican": {
+   "src": "/art/tarot/tarot_magican.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_moon": {
+   "src": "/art/tarot/tarot_moon.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_priestess": {
+   "src": "/art/tarot/tarot_priestess.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_prist": {
+   "src": "/art/tarot/tarot_prist.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_star": {
+   "src": "/art/tarot/tarot_star.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_strenght": {
+   "src": "/art/tarot/tarot_strenght.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_sun": {
+   "src": "/art/tarot/tarot_sun.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_temperance": {
+   "src": "/art/tarot/tarot_temperance.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_tower": {
+   "src": "/art/tarot/tarot_tower.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_wheel": {
+   "src": "/art/tarot/tarot_wheel.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "tarot/tarot_world": {
+   "src": "/art/tarot/tarot_world.webp",
+   "w": 600,
+   "h": 1029
+  },
+  "background": {
+   "src": "/art/background.webp",
+   "x": 0,
+   "y": 0,
+   "w": 1206,
+   "h": 2622
+  },
+  "bird": {
+   "src": "/art/bird.webp",
+   "x": 94,
+   "y": 212,
+   "w": 183,
+   "h": 137
+  },
+  "coins": {
+   "src": "/art/coins.webp",
+   "x": 896,
+   "y": 56,
+   "w": 247,
+   "h": 116
+  },
+  "laryok": {
+   "src": "/art/laryok.webp",
+   "x": 13,
+   "y": 669,
+   "w": 1193,
+   "h": 1560
+  },
+  "magic_ball/ball_back": {
+   "src": "/art/magic_ball/ball_back.webp",
+   "x": 280,
+   "y": 803,
+   "w": 750,
+   "h": 714
+  },
+  "magic_ball/ball_front": {
+   "src": "/art/magic_ball/ball_front.webp",
+   "x": 279,
+   "y": 803,
+   "w": 752,
+   "h": 714
+  },
+  "magic_ball/magic_ball_button": {
+   "src": "/art/magic_ball/magic_ball_button.webp",
+   "x": 890,
+   "y": 1097,
+   "w": 139,
+   "h": 135
+  },
+  "newspaper/newspaper_button": {
+   "src": "/art/newspaper/newspaper_button.webp",
+   "x": 136,
+   "y": 1280,
+   "w": 227,
+   "h": 249
+  }
+ }
+}
