@@ -4,11 +4,15 @@ import { art, CANVAS } from '../art';
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 
+// Висота польоту на полотні: між лічильником монет (низ ≈171) і вивіскою ларька (верх ≈669).
+const FLIGHT_Y = 340;
+
 /** Птах повільно й незграбно пролітає небом справа наліво, з паузою 5–14 с між прольотами. */
 export function Bird() {
   const a = art('bird');
   const left = ((a.x ?? 0) / CANVAS.w) * 100;
   const width = (a.w / CANVAS.w) * 100;
+  const top = (FLIGHT_Y / CANVAS.h) * 100;
   const [flight, setFlight] = useState(0);
   const [flying, setFlying] = useState(false);
   const still = reducedMotion();
@@ -22,12 +26,12 @@ export function Bird() {
     return () => clearTimeout(id);
   }, [flying, still]);
 
-  if (still) return <img className="layer" src={a.src} alt="" style={{ left: `${left}%`, top: `${((a.y ?? 0) / CANVAS.h) * 100}%`, width: `${width}%` }} />;
+  if (still) return <img className="layer" src={a.src} alt="" style={{ left: `${left}%`, top: `${top}%`, width: `${width}%` }} />;
   if (!flying) return null;
 
   const style = {
     left: `${left}%`,
-    top: `${((a.y ?? 0) / CANVAS.h) * 100}%`,
+    top: `${top}%`,
     width: `${width}%`,
     '--from': `${((100 - left) / width) * 100}%`,
     '--to': `${(-(left + width) / width) * 100}%`,
