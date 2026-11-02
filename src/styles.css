@@ -398,8 +398,12 @@ button {
   display: block;
   width: 50cqw;
   height: auto;
-  border-radius: 2.2cqw;
-  box-shadow: 0 1cqw 2cqw rgb(40 30 25 / 0.3);
+  /* тінь повторює форму картки (картинки з прозорим тлом), а не прямокутник */
+  filter: drop-shadow(0 1cqw 1.4cqw rgb(40 30 25 / 0.32));
+}
+/* Колода ширша за аркан на товщину стопки, тож щоб лице не «стрибало» при перевертанні. */
+.card.deck {
+  width: 53.5cqw;
 }
 .cup {
   display: block;

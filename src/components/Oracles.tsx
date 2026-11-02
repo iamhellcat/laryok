@@ -68,7 +68,7 @@ function Tarot({ character, onReveal, onClose }: OracleProps) {
       roll={() => pick(TAROT_CARDS)}
       onReveal={onReveal}
       onClose={onClose}
-      back={<Img name="tarot/tarot_deck" className="card" />}
+      back={<Img name="tarot/tarot_deck" className="card deck" />}
       result={(card) => {
         const { title, body } = splitReading(character.tarot[card]);
         return (

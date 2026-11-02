@@ -6,6 +6,65 @@ import { globSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import subsetFont from 'subset-font';
 import { dirname, extname } from 'node:path';
 
+
+/**
+ * Прибирає біле тло навколо карти (JPG не має прозорості). Тло шукаємо заливкою від країв, але тільки
+ * ззовні чорного контуру: щоб не «витекти» крізь дрібні шпарини, контур тимчасово потовщуємо.
+ * Біле всередині контуру (краї сторінок колоди) лишається.
+ */
+function dilate(mask, w, h, r) {
+  const tmp = new Uint8Array(w * h);
+  const out = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) {
+    let last = -1e9;
+    for (let x = 0; x < w; x++) { if (mask[y * w + x]) last = x; if (x - last <= r) tmp[y * w + x] = 1; }
+    last = 1e9;
+    for (let x = w - 1; x >= 0; x--) { if (mask[y * w + x]) last = x; if (last - x <= r) tmp[y * w + x] = 1; }
+  }
+  for (let x = 0; x < w; x++) {
+    let last = -1e9;
+    for (let y = 0; y < h; y++) { if (tmp[y * w + x]) last = y; if (y - last <= r) out[y * w + x] = 1; }
+    last = 1e9;
+    for (let y = h - 1; y >= 0; y--) { if (tmp[y * w + x]) last = y; if (last - y <= r) out[y * w + x] = 1; }
+  }
+  return out;
+}
+
+async function removeWhiteBackground(input) {
+  const { data, info } = await sharp(input).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { width: w, height: h } = info;
+  const dark = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) dark[i] = Math.min(data[i * 3], data[i * 3 + 1], data[i * 3 + 2]) < 205 ? 1 : 0;
+
+  const wall = dilate(dark, w, h, 4);
+  const outside = new Uint8Array(w * h);
+  const stack = [];
+  const push = (x, y) => { const i = y * w + x; if (!wall[i] && !outside[i]) { outside[i] = 1; stack.push(i); } };
+  for (let x = 0; x < w; x++) { push(x, 0); push(x, h - 1); }
+  for (let y = 0; y < h; y++) { push(0, y); push(w - 1, y); }
+  while (stack.length) {
+    const i = stack.pop();
+    const x = i % w, y = (i - x) / w;
+    if (x > 0) push(x - 1, y);
+    if (x < w - 1) push(x + 1, y);
+    if (y > 0) push(x, y - 1);
+    if (y < h - 1) push(x, y + 1);
+  }
+
+  // Заливка зупинилась за 4 px до контуру: добираємо цю смугу, але лише там, де світле (не лінія).
+  const reach = dilate(outside, w, h, 5);
+  const rgba = Buffer.alloc(w * h * 4);
+  for (let i = 0; i < w * h; i++) {
+    rgba[i * 4] = data[i * 3]; rgba[i * 4 + 1] = data[i * 3 + 1]; rgba[i * 4 + 2] = data[i * 3 + 2];
+    rgba[i * 4 + 3] = reach[i] && !dark[i] ? 0 : 255;
+  }
+  // Трохи згладжуємо край прозорості, щоб не було драбинки.
+  const alpha = await sharp(rgba, { raw: { width: w, height: h, channels: 4 } }).extractChannel(3).blur(0.8).toBuffer();
+  const out = Buffer.from(rgba);
+  for (let i = 0; i < w * h; i++) out[i * 4 + 3] = alpha[i];
+  return sharp(out, { raw: { width: w, height: h, channels: 4 } });
+}
+
 const CANVAS = { w: 1206, h: 2622 };
 const files = globSync('Arts/**/*.{PNG,jpg}').filter((f) => !f.endsWith('sample.PNG')).sort();
 const manifest = { canvas: CANVAS, art: {} };
@@ -22,7 +81,9 @@ for (const f of files) {
     const box = key.endsWith('tarot_deck')
       ? { left: 56, top: 164, width: 1042, height: 1712 }
       : { left: 122, top: 166, width: 973, height: 1669 };
-    const info = await sharp(f).extract(box).resize({ width: 600 }).webp({ quality: 86 }).toFile(out);
+    const cropped = await sharp(f).extract(box).png().toBuffer();
+    const cutOut = await removeWhiteBackground(cropped);
+    const info = await cutOut.resize({ width: 600 }).webp({ quality: 88, alphaQuality: 95 }).toFile(out);
     manifest.art[key] = { src: `/art/${key}.webp`, w: info.width, h: info.height };
     continue;
   }
