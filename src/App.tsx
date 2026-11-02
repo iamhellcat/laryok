@@ -32,6 +32,7 @@ export default function App() {
   const [balance, setBalance] = useState(wallet.balance);
   const [push, setPush] = useState(wallet.push);
   const [ui, setUi] = useState<Ui>({ kind: 'idle' });
+  const [hover, setHover] = useState(false);
 
   const sayNode = (id: string) => {
     const node = character.nodes[id];
@@ -77,7 +78,10 @@ export default function App() {
         <Layer name="background" />
         <Bird />
         <Layer name="laryok" />
-        <Layer name={hasArt(sprite) ? sprite : `characters/${character.id}/${character.id}_neutral`} />
+        <Layer
+          name={hasArt(sprite) ? sprite : `characters/${character.id}/${character.id}_neutral`}
+          className={hover ? 'wiggle' : ''}
+        />
         {PRODUCTS.map((p) => <Layer key={p} name={p} />)}
 
         <button
@@ -89,6 +93,8 @@ export default function App() {
             width: `${(kiosk.w / CANVAS.w) * 100}%`,
             height: `${(kiosk.h / CANVAS.h) * 100}%`,
           }}
+          onPointerEnter={(e) => e.pointerType === 'mouse' && setHover(true)}
+          onPointerLeave={() => setHover(false)}
           onClick={() => sayNode(character.start)}
         />
 

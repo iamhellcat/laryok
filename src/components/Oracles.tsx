@@ -7,7 +7,8 @@ import type { Character, SystemId } from '../data/types';
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 function Img({ name, className }: { name: string; className?: string }) {
-  return <img className={className} src={art(name).src} alt="" draggable={false} />;
+  const a = art(name);
+  return <img className={className} src={a.src} width={a.w} height={a.h} alt="" draggable={false} />;
 }
 
 interface RevealProps<T> {
@@ -90,7 +91,7 @@ function Ball({ onReveal, onClose }: OracleProps) {
       roll={() => pick(MAGIC_BALL_ANSWERS)}
       onReveal={onReveal}
       onClose={onClose}
-      back={<Img name="magic_ball/ball_back" className="ball" />}
+      back={<div className="ball"><Img name="magic_ball/ball_back" /></div>}
       result={(answer) => (
         <div className="ball">
           <Img name="magic_ball/ball_front" />
