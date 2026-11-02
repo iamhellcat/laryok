@@ -29,50 +29,52 @@ export function Astro({ onClose }: { onClose: () => void }) {
       <div className="frame oracle paper" role="dialog" aria-label="Астро вісник">
         <button className="close" aria-label="Закрити" onClick={onClose}>×</button>
 
-        <header className="paper-head">
-          <h2>СЬОГОДНІ</h2>
-          <p>{r.dateLabel}</p>
-        </header>
+        <div className="oracle-scroll">
+          <header className="paper-head">
+            <h2>СЬОГОДНІ</h2>
+            <p>{r.dateLabel}</p>
+          </header>
 
-        <section className="paper-moon">
-          <MoonIcon phase={r.phase} />
-          <div>
-            <h3>{r.phase.name}</h3>
-            <p className="note">{percent}% освітлення · {r.lunarDay.n}-та місячна доба</p>
-          </div>
-        </section>
-        <p className="paper-text">
-          <b>{r.lunarDay.title}.</b> Сприятливо: {r.lunarDay.good}. Краще уникати: {r.lunarDay.avoid}.
-        </p>
+          <section className="paper-moon">
+            <MoonIcon phase={r.phase} />
+            <div>
+              <h3>{r.phase.name}</h3>
+              <p className="note">{percent}% освітлення · {r.lunarDay.n}-та місячна доба</p>
+            </div>
+          </section>
+          <p className="paper-text">
+            <b>{r.lunarDay.title}.</b> Сприятливо: {r.lunarDay.good}. Краще уникати: {r.lunarDay.avoid}.
+          </p>
 
-        <section>
-          <h3>Місяць {r.moonSign.in}</h3>
-          <p className="paper-text">{r.moonSign.moon}</p>
-          {r.moonIngress && (
-            <p className="note">О {clock(r.moonIngress.time)} Місяць переходить у знак «{r.moonIngress.sign.name}».</p>
-          )}
-        </section>
+          <section>
+            <h3>Місяць {r.moonSign.in}</h3>
+            <p className="paper-text">{r.moonSign.moon}</p>
+            {r.moonIngress && (
+              <p className="note">О {clock(r.moonIngress.time)} Місяць переходить у знак «{r.moonIngress.sign.name}».</p>
+            )}
+          </section>
 
-        <section>
-          <h3>Аспекти дня</h3>
-          {r.events.length === 0 && <p className="paper-text">Сьогодні без гучних подій: спокійний космічний фон.</p>}
-          {r.main && <p className="paper-text"><b>{r.main}</b></p>}
-          {r.events.map((e) => (
-            <p className={`paper-text event ${e.tone}`} key={e.title + e.time.getTime()}>
-              <b>{clock(e.time)} · {e.title}.</b> {e.text}
-              {e.detail && <span className="detail">{e.detail}</span>}
-            </p>
-          ))}
-        </section>
+          <section>
+            <h3>Аспекти дня</h3>
+            {r.events.length === 0 && <p className="paper-text">Сьогодні без гучних подій: спокійний космічний фон.</p>}
+            {r.main && <p className="paper-text"><b>{r.main}</b></p>}
+            {r.events.map((e) => (
+              <p className={`paper-text event ${e.tone}`} key={e.title + e.time.getTime()}>
+                <b>{clock(e.time)} · {e.title}.</b> {e.text}
+                {e.detail && <span className="detail">{e.detail}</span>}
+              </p>
+            ))}
+          </section>
 
-        <section>
-          <h3>Сонце {r.sunSign.in}</h3>
-          {r.retrograde.length > 0 && <p className="note">Ретроградні: {r.retrograde.join(', ')}.</p>}
-          {r.mercuryRetrograde && <p className="paper-text">{MERCURY_RETROGRADE}</p>}
-        </section>
+          <section>
+            <h3>Сонце {r.sunSign.in}</h3>
+            {r.retrograde.length > 0 && <p className="note">Ретроградні: {r.retrograde.join(', ')}.</p>}
+            {r.mercuryRetrograde && <p className="paper-text">{MERCURY_RETROGRADE}</p>}
+          </section>
 
-        <p className="paper-tip">{r.summary}</p>
-        <button className="reply done" onClick={onClose}>Гаразд</button>
+          <p className="paper-tip">{r.summary}</p>
+          <button className="reply done" onClick={onClose}>Гаразд</button>
+        </div>
       </div>
     </>
   );

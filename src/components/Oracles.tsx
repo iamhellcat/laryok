@@ -37,17 +37,19 @@ function RevealOracle<T>({ roll, back, result, onReveal, onClose, label }: Revea
       <button className="backdrop dim" aria-label="Закрити" onClick={onClose} />
       <div className="frame oracle" role="dialog" aria-label={label}>
         <button className="close" aria-label="Закрити" onClick={onClose}>×</button>
-        {rolled ? (
-          <div className="oracle-body reveal">
-            {result(rolled.value)}
-            <button className="reply done" onClick={onClose}>Гаразд</button>
-          </div>
-        ) : (
-          <button className="oracle-body tick-target" onClick={reveal}>
-            {back}
-            <span className="tick">Тик!</span>
-          </button>
-        )}
+        <div className="oracle-scroll">
+          {rolled ? (
+            <div className="oracle-body reveal">
+              {result(rolled.value)}
+              <button className="reply done" onClick={onClose}>Гаразд</button>
+            </div>
+          ) : (
+            <button className="oracle-body tick-target" onClick={reveal}>
+              {back}
+              <span className="tick">Тик!</span>
+            </button>
+          )}
+        </div>
       </div>
     </>
   );
