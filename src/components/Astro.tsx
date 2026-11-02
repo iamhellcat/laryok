@@ -56,9 +56,11 @@ export function Astro({ onClose }: { onClose: () => void }) {
         <section>
           <h3>Аспекти дня</h3>
           {r.events.length === 0 && <p className="paper-text">Сьогодні без гучних подій: спокійний космічний фон.</p>}
+          {r.main && <p className="paper-text"><b>{r.main}</b></p>}
           {r.events.map((e) => (
             <p className={`paper-text event ${e.tone}`} key={e.title + e.time.getTime()}>
               <b>{clock(e.time)} · {e.title}.</b> {e.text}
+              {e.detail && <span className="detail">{e.detail}</span>}
             </p>
           ))}
         </section>

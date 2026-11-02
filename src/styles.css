@@ -470,6 +470,12 @@ button {
   line-height: 1.35;
   color: rgb(59 47 42 / 0.75);
 }
+.detail {
+  display: block;
+  margin-top: 0.4cqw;
+  font-size: 3cqw;
+  color: rgb(59 47 42 / 0.6);
+}
 .event.soft b {
   color: #3f7352;
 }

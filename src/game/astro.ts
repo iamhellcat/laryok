@@ -1,5 +1,5 @@
 import { Body, EclipticGeoMoon, Ecliptic, GeoVector, MoonPhase, Observer, SearchMoonPhase, SearchRiseSet, SunPosition } from 'astronomy-engine';
-import { ASPECTS, LUNAR_DAYS, PLANETS, SIGNS, SUN_MOON, TONE_SUMMARY, type LunarDay, type Sign, type Tone } from '../data/astro';
+import { ASPECTS, LUNAR_DAYS, PAIR_SPHERE, PLANETS, SIGNS, SUN_MOON, TONE_SUMMARY, type LunarDay, type Sign, type Tone } from '../data/astro';
 
 // Місячну добу рахуємо за сходом Місяця в Києві.
 const KYIV = new Observer(50.4501, 30.5234, 180);
@@ -18,6 +18,8 @@ export interface MoonPhaseInfo {
 export interface AspectEvent {
   time: Date;
   title: string;
+  /** Які планети в якому аспекті (для фазових подій немає). */
+  detail?: string;
   text: string;
   tone: Tone;
   score: number;
@@ -35,6 +37,8 @@ export interface AstroReport {
   retrograde: string[];
   mercuryRetrograde: boolean;
   events: AspectEvent[];
+  /** «Головний аспект дня — …» */
+  main: string;
   summary: string;
 }
 
@@ -127,8 +131,9 @@ export function computeAstro(now: Date = new Date()): AstroReport {
           const phaseEvent = BODIES[i] === Body.Sun && BODIES[j] === Body.Moon ? SUN_MOON[aspect.angle] : undefined;
           events.push({
             time,
-            title: phaseEvent?.title ?? `${cap(aspect.name)}: ${a.name} — ${b.name}`,
-            text: phaseEvent?.text ?? `Теми: ${a.theme} та ${b.theme}. ${aspect.line}`,
+            title: phaseEvent?.title ?? cap(PAIR_SPHERE[`${BODIES[i]}-${BODIES[j]}`]),
+            detail: phaseEvent ? undefined : `${cap(aspect.name)}: ${a.name} — ${b.name}`,
+            text: phaseEvent?.text ?? aspect.lines[(time.getHours() + i + j) % aspect.lines.length],
             tone: aspect.tone,
             score: phaseEvent ? 50 : a.weight + b.weight + aspect.weight,
             moon: BODIES[i] === Body.Moon || BODIES[j] === Body.Moon,
@@ -140,11 +145,12 @@ export function computeAstro(now: Date = new Date()): AstroReport {
 
   // Місяць робить багато аспектів за добу, тож залишаємо найвагоміші й не більше трьох місячних.
   let moonKept = 0;
-  const picked = events
+  const ranked = events
     .sort((x, y) => y.score - x.score)
     .filter((e) => !e.moon || ++moonKept <= 3)
-    .slice(0, 5)
-    .sort((x, y) => x.time.getTime() - y.time.getTime());
+    .slice(0, 5);
+  const lead = ranked.find((e) => e.score < 50) ?? ranked[0];
+  const picked = [...ranked].sort((x, y) => x.time.getTime() - y.time.getTime());
 
   let moonIngress: AstroReport['moonIngress'] = null;
   for (let k = 0; k < 24; k++) {
@@ -174,6 +180,7 @@ export function computeAstro(now: Date = new Date()): AstroReport {
     retrograde,
     mercuryRetrograde: retrograde.includes(PLANETS.Mercury.name),
     events: picked,
+    main: lead ? `Головний аспект дня — ${lead.title.charAt(0).toLowerCase()}${lead.title.slice(1)}.` : '',
     summary: TONE_SUMMARY[soft > hard ? 'soft' : hard > soft ? 'hard' : 'neutral'],
   };
 }
