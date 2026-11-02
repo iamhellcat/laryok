@@ -46,6 +46,7 @@ body {
   color: var(--ink);
   font-family: var(--body);
   overflow: hidden;
+  overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -58,22 +59,51 @@ button {
 
 /* ---------- сцена ---------- */
 
+/* Сцена: арт 1206×2622. Зі звичайним екраном (комп'ютер) вписуємо цілком, а на вузьких екранах
+   телефонів заповнюємо весь екран без рамок: арт по центру, зайве обрізається порівну зверху й знизу або з боків. */
 .stage {
-  display: grid;
-  place-items: center;
-  height: 100dvh;
-  width: 100vw;
+  --uw: min(100vw, calc(100dvh * 1206 / 2622));
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(var(--sky) 0 60%, var(--ground) 60%);
 }
 
 .scene {
-  --h: min(100dvh, calc(100vw * 2622 / 1206));
-  position: relative;
-  height: var(--h);
-  width: calc(var(--h) * 1206 / 2622);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--uw);
+  aspect-ratio: 1206 / 2622;
+  transform: translate(-50%, -50%);
   container-type: inline-size;
-  overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Інтерфейс поверх сцени: вікна, діалог, пуш. Ширина як у сцени, висота як у екрана. */
+.ui {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: var(--uw);
+  transform: translateX(-50%);
+  container-type: inline-size;
+  pointer-events: none;
+}
+.ui > * {
+  pointer-events: auto;
+}
+
+@media (max-aspect-ratio: 62 / 100) {
+  .stage {
+    --uw: 100vw;
+  }
+  .scene {
+    width: max(100vw, calc(100dvh * 1206 / 2622));
+  }
 }
 
 .layer {
@@ -208,7 +238,7 @@ button {
   z-index: 31;
   left: 8cqw;
   right: 8cqw;
-  top: 80%;
+  bottom: max(10cqw, env(safe-area-inset-bottom));
   padding: 3.4cqw 5cqw 3.8cqw;
   text-align: center;
 }
@@ -231,7 +261,7 @@ button {
 .dialog {
   left: 4cqw;
   right: 4cqw;
-  bottom: 4cqw;
+  bottom: max(4cqw, env(safe-area-inset-bottom));
   padding: 4.5cqw 4.5cqw 3cqw;
 }
 .say {
@@ -263,6 +293,22 @@ button {
 .reply:active {
   transform: translateY(0.6cqw);
   box-shadow: none;
+}
+
+/* Довге меню (вибір ворожіння) у дві колонки, щоб не закривало персонажа. */
+.replies.many {
+  grid-template-columns: 1fr 1fr;
+  gap: 1.8cqw;
+}
+.replies.many .reply {
+  padding: 2cqw 2.4cqw;
+  font-size: 3.4cqw;
+}
+.dialog:has(.replies.many) {
+  padding-top: 3.6cqw;
+}
+.dialog:has(.replies.many) .say {
+  margin-bottom: 2.4cqw;
 }
 
 /* ---------- ворожіння ---------- */

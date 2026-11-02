@@ -12,7 +12,7 @@ export function Dialog({ say, replies, onReply, onClose }: Props) {
     <div className="frame dialog" role="dialog" aria-label="Розмова">
       <button className="close" aria-label="Закрити" onClick={onClose}>×</button>
       <p className="say" key={say}>{say}</p>
-      <div className="replies">
+      <div className={replies.length > 3 ? 'replies many' : 'replies'}>
         {replies.map((r) => (
           <button key={r.label} className="reply" onClick={() => onReply(r)}>{r.label}</button>
         ))}

@@ -102,6 +102,9 @@ export default function App() {
           onClick={() => sayNode(character.start)}
         />
 
+      </div>
+
+      <div className="ui">
         <CoinCounter balance={balance} />
 
         {ui.kind === 'dialog' && (
