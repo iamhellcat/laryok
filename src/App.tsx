@@ -51,8 +51,12 @@ export default function App() {
   };
 
   const choose = (system: SystemId) => {
-    if (balance < 1) sayNode('broke');
-    else setUi({ kind: 'oracle', system });
+    if (balance < 1) {
+      sayNode('broke');
+      return;
+    }
+    if (system === 'astro') spend();
+    setUi({ kind: 'oracle', system });
   };
 
   const spend = () => {

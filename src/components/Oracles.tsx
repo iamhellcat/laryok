@@ -5,6 +5,7 @@ import { MO_READINGS, MO_SYLLABLES } from '../data/mo';
 import { COFFEE_SYMBOLS, MAGIC_BALL_ANSWERS, type CoffeeSymbol } from '../data/oracles';
 import { splitReading, TAROT_CARDS, tarotArtKey, type TarotCard } from '../data/tarot';
 import type { Character, SystemId } from '../data/types';
+import { Astro } from './Astro';
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
@@ -206,6 +207,7 @@ export function Oracle({ system, ...props }: OracleProps & { system: SystemId })
     case 'coffee': return <Coffee {...props} />;
     case 'iching': return <IChing {...props} />;
     case 'mo': return <Mo {...props} />;
+    case 'astro': return <Astro onClose={props.onClose} />;
     default: return null;
   }
 }

@@ -407,6 +407,104 @@ button {
   text-align: center;
 }
 
+/* ---------- астро вісник ---------- */
+
+.paper {
+  padding: 6cqw 5.5cqw 5cqw;
+  background: #efeadc;
+  text-align: left;
+}
+.paper-head {
+  margin: 0 7cqw 1cqw;
+  padding: 1.4cqw 0 1.2cqw;
+  border-block: 0.5cqw solid var(--line);
+  text-align: center;
+}
+.paper-head h2 {
+  margin: 0;
+  font-family: var(--head);
+  font-weight: 900;
+  font-size: 15cqw;
+  line-height: 1;
+  letter-spacing: 0.05em;
+}
+.paper-head p {
+  margin: 0.4cqw 0 0;
+  font-size: 3.4cqw;
+}
+.paper-head p::first-letter {
+  text-transform: uppercase;
+}
+.paper section {
+  margin-top: 3cqw;
+  padding-top: 2.4cqw;
+  border-top: 0.3cqw solid rgb(75 58 51 / 0.35);
+}
+.paper .paper-moon {
+  display: flex;
+  align-items: center;
+  gap: 4cqw;
+  margin-top: 3cqw;
+  border-top: 0;
+  padding-top: 0;
+}
+.paper h3 {
+  margin: 0 0 1cqw;
+  font-family: var(--head);
+  font-weight: 800;
+  font-size: 6.6cqw;
+  line-height: 1.05;
+  color: var(--red);
+}
+.paper .paper-moon h3 {
+  margin: 0;
+}
+.paper-text {
+  margin: 0 0 1.8cqw;
+  font-size: 3.7cqw;
+  line-height: 1.4;
+}
+.note {
+  margin: 0.6cqw 0 1.6cqw;
+  font-size: 3.2cqw;
+  line-height: 1.35;
+  color: rgb(59 47 42 / 0.75);
+}
+.event.soft b {
+  color: #3f7352;
+}
+.event.hard b {
+  color: var(--red);
+}
+.paper-tip {
+  margin: 3cqw 0 0;
+  padding: 2.4cqw 3cqw;
+  border: 0.5cqw dashed var(--line);
+  font-size: 3.7cqw;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.paper .done {
+  display: block;
+  margin-inline: auto;
+}
+.moon-icon {
+  flex: none;
+  width: 19cqw;
+  height: 19cqw;
+}
+.moon-dark {
+  fill: #5b4a43;
+}
+.moon-lit {
+  fill: #f6e8b0;
+}
+.moon-rim {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 3;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
