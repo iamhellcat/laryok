@@ -154,117 +154,397 @@
   "tarot/tarot_chariot": {
    "src": "/art/tarot/tarot_chariot.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
+  },
+  "tarot/tarot_cups_1": {
+   "src": "/art/tarot/tarot_cups_1.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_10": {
+   "src": "/art/tarot/tarot_cups_10.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_2": {
+   "src": "/art/tarot/tarot_cups_2.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_3": {
+   "src": "/art/tarot/tarot_cups_3.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_4": {
+   "src": "/art/tarot/tarot_cups_4.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_5": {
+   "src": "/art/tarot/tarot_cups_5.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_6": {
+   "src": "/art/tarot/tarot_cups_6.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_7": {
+   "src": "/art/tarot/tarot_cups_7.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_8": {
+   "src": "/art/tarot/tarot_cups_8.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_9": {
+   "src": "/art/tarot/tarot_cups_9.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_king": {
+   "src": "/art/tarot/tarot_cups_king.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_knight": {
+   "src": "/art/tarot/tarot_cups_knight.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_page": {
+   "src": "/art/tarot/tarot_cups_page.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_cups_queen": {
+   "src": "/art/tarot/tarot_cups_queen.webp",
+   "w": 600,
+   "h": 940
   },
   "tarot/tarot_death": {
    "src": "/art/tarot/tarot_death.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_deck": {
    "src": "/art/tarot/tarot_deck.webp",
    "w": 600,
-   "h": 986
+   "h": 940
   },
   "tarot/tarot_devil": {
    "src": "/art/tarot/tarot_devil.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_emperor": {
    "src": "/art/tarot/tarot_emperor.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_empress": {
    "src": "/art/tarot/tarot_empress.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_fool": {
    "src": "/art/tarot/tarot_fool.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_hanged_man": {
    "src": "/art/tarot/tarot_hanged_man.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_hermit": {
    "src": "/art/tarot/tarot_hermit.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_judgement": {
    "src": "/art/tarot/tarot_judgement.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_justice": {
    "src": "/art/tarot/tarot_justice.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_lovers": {
    "src": "/art/tarot/tarot_lovers.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_magican": {
    "src": "/art/tarot/tarot_magican.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_moon": {
    "src": "/art/tarot/tarot_moon.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
+  },
+  "tarot/tarot_pentacles_1": {
+   "src": "/art/tarot/tarot_pentacles_1.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_10": {
+   "src": "/art/tarot/tarot_pentacles_10.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_2": {
+   "src": "/art/tarot/tarot_pentacles_2.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_3": {
+   "src": "/art/tarot/tarot_pentacles_3.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_4": {
+   "src": "/art/tarot/tarot_pentacles_4.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_5": {
+   "src": "/art/tarot/tarot_pentacles_5.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_6": {
+   "src": "/art/tarot/tarot_pentacles_6.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_7": {
+   "src": "/art/tarot/tarot_pentacles_7.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_8": {
+   "src": "/art/tarot/tarot_pentacles_8.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_9": {
+   "src": "/art/tarot/tarot_pentacles_9.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_king": {
+   "src": "/art/tarot/tarot_pentacles_king.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_knight": {
+   "src": "/art/tarot/tarot_pentacles_knight.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_page": {
+   "src": "/art/tarot/tarot_pentacles_page.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_pentacles_queen": {
+   "src": "/art/tarot/tarot_pentacles_queen.webp",
+   "w": 600,
+   "h": 940
   },
   "tarot/tarot_priestess": {
    "src": "/art/tarot/tarot_priestess.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_prist": {
    "src": "/art/tarot/tarot_prist.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_star": {
    "src": "/art/tarot/tarot_star.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_strenght": {
    "src": "/art/tarot/tarot_strenght.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_sun": {
    "src": "/art/tarot/tarot_sun.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
+  },
+  "tarot/tarot_swords_1": {
+   "src": "/art/tarot/tarot_swords_1.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_10": {
+   "src": "/art/tarot/tarot_swords_10.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_2": {
+   "src": "/art/tarot/tarot_swords_2.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_3": {
+   "src": "/art/tarot/tarot_swords_3.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_4": {
+   "src": "/art/tarot/tarot_swords_4.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_5": {
+   "src": "/art/tarot/tarot_swords_5.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_6": {
+   "src": "/art/tarot/tarot_swords_6.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_7": {
+   "src": "/art/tarot/tarot_swords_7.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_8": {
+   "src": "/art/tarot/tarot_swords_8.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_9": {
+   "src": "/art/tarot/tarot_swords_9.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_king": {
+   "src": "/art/tarot/tarot_swords_king.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_knight": {
+   "src": "/art/tarot/tarot_swords_knight.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_page": {
+   "src": "/art/tarot/tarot_swords_page.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_swords_queen": {
+   "src": "/art/tarot/tarot_swords_queen.webp",
+   "w": 600,
+   "h": 940
   },
   "tarot/tarot_temperance": {
    "src": "/art/tarot/tarot_temperance.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_tower": {
    "src": "/art/tarot/tarot_tower.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
+  },
+  "tarot/tarot_wands_1": {
+   "src": "/art/tarot/tarot_wands_1.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_10": {
+   "src": "/art/tarot/tarot_wands_10.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_2": {
+   "src": "/art/tarot/tarot_wands_2.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_3": {
+   "src": "/art/tarot/tarot_wands_3.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_4": {
+   "src": "/art/tarot/tarot_wands_4.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_5": {
+   "src": "/art/tarot/tarot_wands_5.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_6": {
+   "src": "/art/tarot/tarot_wands_6.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_7": {
+   "src": "/art/tarot/tarot_wands_7.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_8": {
+   "src": "/art/tarot/tarot_wands_8.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_9": {
+   "src": "/art/tarot/tarot_wands_9.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_king": {
+   "src": "/art/tarot/tarot_wands_king.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_knight": {
+   "src": "/art/tarot/tarot_wands_knight.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_page": {
+   "src": "/art/tarot/tarot_wands_page.webp",
+   "w": 600,
+   "h": 940
+  },
+  "tarot/tarot_wands_queen": {
+   "src": "/art/tarot/tarot_wands_queen.webp",
+   "w": 600,
+   "h": 940
   },
   "tarot/tarot_wheel": {
    "src": "/art/tarot/tarot_wheel.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "tarot/tarot_world": {
    "src": "/art/tarot/tarot_world.webp",
    "w": 600,
-   "h": 1029
+   "h": 940
   },
   "background": {
    "src": "/art/background.webp",

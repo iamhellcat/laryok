@@ -72,18 +72,18 @@ const manifest = { canvas: CANVAS, art: {} };
 for (const f of files) {
   const rel = f.replace(/^Arts\//, '');
   const key = rel.replace(/\.[^.]+$/, '').toLowerCase();
-  const isCard = rel.startsWith('Tarot/') && extname(f) === '.jpg';
+  const isCard = rel.startsWith('Tarot/') && !rel.includes('button');
   const out = `public/art/${key}.webp`;
   mkdirSync(dirname(out), { recursive: true });
 
   if (isCard) {
-    // На оригіналах навколо карти білі поля; рамка однакова для всіх арканів, колода має власну (з товщиною).
-    const box = key.endsWith('tarot_deck')
-      ? { left: 56, top: 164, width: 1042, height: 1712 }
-      : { left: 122, top: 166, width: 973, height: 1669 };
+    // Усі карти й колода мають спільне полотно: лице завжди на тому самому місці й одного розміру,
+    // а корони й іскри, що виходять за рамку, не обрізаються.
+    const box = { left: 56, top: 160, width: 1104, height: 1730 };
+    // Старші аркани й колода — JPG з білим тлом; молодші аркани — PNG, вони вже прозорі.
     const cropped = await sharp(f).extract(box).png().toBuffer();
-    const cutOut = await removeWhiteBackground(cropped);
-    const info = await cutOut.resize({ width: 600 }).webp({ quality: 88, alphaQuality: 95 }).toFile(out);
+    const image = extname(f).toLowerCase() === '.jpg' ? await removeWhiteBackground(cropped) : sharp(cropped);
+    const info = await image.resize({ width: 600 }).webp({ quality: 88, alphaQuality: 95 }).toFile(out);
     manifest.art[key] = { src: `/art/${key}.webp`, w: info.width, h: info.height };
     continue;
   }
