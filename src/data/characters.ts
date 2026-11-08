@@ -1,0 +1,20 @@
+import { babka } from './babka';
+import { cat } from './cat';
+import type { Character } from './types';
+
+/** Порядок зміни персонажів по днях. Студент додасться третім, коли буде готовий. */
+export const CHARACTERS: Character[] = [babka, cat];
+
+/** Перший день гри: чергує бабку, кота, ... далі по колу. */
+const FIRST_DAY = new Date(2026, 10, 2);
+
+const midnight = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+
+/** Персонаж дня. Для перевірки: ?character=cat чи ?character=babka. */
+export function characterForToday(now: Date = new Date()): Character {
+  const forced = new URLSearchParams(location.search).get('character');
+  const chosen = CHARACTERS.find((c) => c.id === forced);
+  if (chosen) return chosen;
+  const days = Math.round((midnight(now) - midnight(FIRST_DAY)) / 86_400_000);
+  return CHARACTERS[((days % CHARACTERS.length) + CHARACTERS.length) % CHARACTERS.length];
+}

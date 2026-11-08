@@ -15,9 +15,13 @@ export interface DialogNode {
   replies: Reply[] | 'menu';
 }
 
+export type CharacterId = 'babka' | 'cat';
+
 export interface Character {
-  id: 'babka';
+  id: CharacterId;
   start: string;
+  /** Якщо задано, спрайт персонажа довільно міняється між цими настроями (кіт). */
+  wanderMoods?: Mood[];
   nodes: Record<string, DialogNode>;
   /** Тлумачення арканів Таро від цього персонажа. */
   tarot: Record<import('./tarot').TarotCard, string>;

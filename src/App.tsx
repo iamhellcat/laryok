@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bird } from './components/Bird';
 import { CoinCounter } from './components/CoinCounter';
 import { DailyPush } from './components/DailyPush';
@@ -6,14 +6,15 @@ import { Dialog } from './components/Dialog';
 import { Layer } from './components/Layer';
 import { Oracle } from './components/Oracles';
 import { art, CANVAS, hasArt } from './art';
-import { babka, READY_SYSTEMS, SYSTEM_LABELS, SYSTEM_ORDER } from './data/babka';
+import { READY_SYSTEMS, SYSTEM_LABELS, SYSTEM_ORDER } from './data/babka';
+import { characterForToday } from './data/characters';
 import type { Mood, Reply, SystemId } from './data/types';
 import { loadWallet, saveBalance } from './game/wallet';
 
 // Читаємо гаманець один раз при запуску, щоб щоденні монети нарахувалися рівно раз.
 const wallet = loadWallet();
 
-const character = babka;
+const character = characterForToday();
 
 type Ui =
   | { kind: 'idle' }
@@ -33,6 +34,20 @@ export default function App() {
   const [push, setPush] = useState(wallet.push);
   const [ui, setUi] = useState<Ui>({ kind: 'idle' });
   const [hover, setHover] = useState(false);
+
+  // Кіт міняє спрайти довільно: раз на кілька секунд випадає один із його настроїв.
+  const [wander, setWander] = useState<Mood>('neutral');
+  useEffect(() => {
+    const moods = character.wanderMoods;
+    if (!moods) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const next = () => {
+      setWander(moods[Math.floor(Math.random() * moods.length)]);
+      timer = setTimeout(next, 3000 + Math.random() * 5000);
+    };
+    timer = setTimeout(next, 2000 + Math.random() * 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const sayNode = (id: string) => {
     const node = character.nodes[id];
@@ -65,7 +80,8 @@ export default function App() {
     saveBalance(next);
   };
 
-  const mood = ui.kind === 'dialog' ? ui.mood : 'neutral';
+  const said = ui.kind === 'dialog' ? ui.mood : 'neutral';
+  const mood = said === 'neutral' && character.wanderMoods ? wander : said;
   const sprite = `characters/${character.id}/${character.id}_${mood}`;
   const kiosk = art('laryok');
 
