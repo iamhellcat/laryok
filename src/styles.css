@@ -568,8 +568,13 @@ button {
   padding: 2.4cqw 3cqw;
   border: 0.5cqw dashed var(--line);
   font-size: 3.7cqw;
-  font-weight: 700;
   line-height: 1.35;
+}
+.paper-tip p {
+  margin: 0 0 1.6cqw;
+}
+.paper-tip p:last-child {
+  margin-bottom: 0;
 }
 .paper .done {
   display: block;

@@ -109,7 +109,13 @@ export function Astro({ onClose }: { onClose: () => void }) {
                 {e.detail && <span className="detail">{e.detail}</span>}
               </p>
             ))}
-            <p className="paper-tip">{r.summary}</p>
+            <div className="paper-tip">
+              {r.theses.map((t) => (
+                <p key={t.label}>
+                  <b>{t.label}:</b> {t.text}
+                </p>
+              ))}
+            </div>
           </section>
 
           <button className="reply done" onClick={onClose}>Гаразд</button>

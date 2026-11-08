@@ -1,6 +1,6 @@
 import { Body, EclipticGeoMoon, Ecliptic, GeoVector, MoonPhase, Observer, SearchMoonPhase, SearchRiseSet, SunPosition } from 'astronomy-engine';
 import {
-  ASPECTS, LUNAR_DAYS, MOON_IN_SIGN, PAIR_SPHERE, PLANETS, RETROGRADE_TEXT, SIGN_NAMES, SUN_IN_SIGN, SUN_MOON, TONE_SUMMARY, type Tone,
+  ASPECTS, LUNAR_DAYS, MOON_IN_SIGN, PAIR_SPHERE, PLANETS, RETROGRADE_TEXT, SIGN_NAMES, SUN_IN_SIGN, SUN_MOON, MOON_SIGN_THESIS, PHASE_THESIS, SUN_SIGN_THESIS, type Tone,
 } from '../data/astro';
 
 // Місячну добу рахуємо за сходом Місяця в Києві.
@@ -70,7 +70,8 @@ export interface AstroReport {
   events: AspectEvent[];
   /** «Головний аспект дня — …» */
   main: string;
-  summary: string;
+  /** Підсумок дня: три короткі тези (фаза Місяця, Сонце в знаку, Місяць у знаку). */
+  theses: { label: string; text: string }[];
 }
 
 const norm360 = (a: number) => ((a % 360) + 360) % 360;
@@ -251,22 +252,28 @@ export function computeAstro(now: Date = new Date()): AstroReport {
   }
   stations.sort((a, b) => a.time.getTime() - b.time.getTime());
 
-  const soft = picked.filter((e) => e.tone === 'soft').length;
-  const hard = picked.filter((e) => e.tone === 'hard').length;
+  const sunIndex = signIndex(longitude(Body.Sun, now));
+  const moonIndex = signIndex(longitude(Body.Moon, now));
+  // «Місяць у Леві», «Сонце в Скорпіоні»: заголовок береться з тексту з документа.
+  const headOf = (text: string) => text.slice(0, text.indexOf('.'));
 
   return {
     today: now,
     dateLabel: now.toLocaleDateString('uk-UA', { weekday: 'long', day: 'numeric', month: 'long' }),
     phase,
     lunarDay,
-    moonSign: MOON_IN_SIGN[signIndex(longitude(Body.Moon, now))],
+    moonSign: MOON_IN_SIGN[moonIndex],
     moonIngress: ingress(1),
-    sunSign: SUN_IN_SIGN[signIndex(longitude(Body.Sun, now))],
+    sunSign: SUN_IN_SIGN[sunIndex],
     sunIngress: ingress(0),
     retrograde,
     stations,
     events: picked,
     main: lead ? `Головний аспект дня — ${lead.title.charAt(0).toLowerCase()}${lead.title.slice(1)}.` : '',
-    summary: TONE_SUMMARY[soft > hard ? 'soft' : hard > soft ? 'hard' : 'neutral'],
+    theses: [
+      { label: phase.name, text: PHASE_THESIS[phase.name] },
+      { label: headOf(SUN_IN_SIGN[sunIndex]), text: SUN_SIGN_THESIS[sunIndex] },
+      { label: headOf(MOON_IN_SIGN[moonIndex]), text: MOON_SIGN_THESIS[moonIndex] },
+    ],
   };
 }
