@@ -40,9 +40,20 @@ export interface Ingress {
 export interface Station {
   time: Date;
   text: string;
+  body: Body;
+  /** true — планета повертається до прямого руху, false — стає ретроградною. */
+  direct: boolean;
+}
+
+export interface RetrogradePlanet {
+  text: string;
+  /** Коли планета вийде з ретроградності (повернеться до прямого руху). */
+  exit: Date | null;
 }
 
 export interface AstroReport {
+  /** Момент, для якого складено випуск. */
+  today: Date;
   dateLabel: string;
   phase: MoonPhaseInfo;
   lunarDay: { n: number; text: string };
@@ -52,8 +63,8 @@ export interface AstroReport {
   /** Якщо протягом доби Місяць чи Сонце переходить в інший знак. */
   moonIngress: Ingress | null;
   sunIngress: Ingress | null;
-  /** Планети, які зараз ретроградні, з описами. */
-  retrograde: string[];
+  /** Планети, які зараз ретроградні, з описами й датою виходу. */
+  retrograde: RetrogradePlanet[];
   /** Планети, що протягом доби змінюють напрямок руху. */
   stations: Station[];
   events: AspectEvent[];
@@ -195,7 +206,25 @@ export function computeAstro(now: Date = new Date()): AstroReport {
   const velocity = (body: Body, t: Date) =>
     norm180(longitude(body, new Date(t.getTime() + HOUR / 2)) - longitude(body, new Date(t.getTime() - HOUR / 2)));
 
-  const retrograde = MOVERS.filter((b) => velocity(b, now) < 0).map((b) => RETROGRADE_TEXT[b]);
+  // Коли ретроградна планета вийде з ретроградності: крокуємо по днях до зміни знаку швидкості, далі уточнюємо до хвилин.
+  const nextDirect = (body: Body): Date | null => {
+    for (let day = 1; day <= 400; day++) {
+      const hi = now.getTime() + day * DAY;
+      if (velocity(body, new Date(hi)) < 0) continue;
+      let lo = hi - DAY;
+      let up = hi;
+      for (let i = 0; i < 18; i++) {
+        const mid = (lo + up) / 2;
+        if (velocity(body, new Date(mid)) < 0) lo = mid;
+        else up = mid;
+      }
+      return new Date(up);
+    }
+    return null;
+  };
+
+  const retroBodies = MOVERS.filter((b) => velocity(b, now) < 0);
+  const retrograde: RetrogradePlanet[] = retroBodies.map((b) => ({ text: RETROGRADE_TEXT[b], exit: nextDirect(b) }));
 
   const stations: Station[] = [];
   for (const body of MOVERS) {
@@ -209,9 +238,14 @@ export function computeAstro(now: Date = new Date()): AstroReport {
         if (Math.sign(velocity(body, new Date(mid))) === Math.sign(v[k])) lo = mid;
         else hi = mid;
       }
+      const direct = v[k + 1] >= 0;
+      // Вихід із ретроградності планети, яка ще ретроградна, вже написаний у її описі.
+      if (direct && retroBodies.includes(body)) continue;
       stations.push({
         time: new Date(hi),
-        text: `${PLANETS[body].name} ${v[k + 1] < 0 ? 'стає ретроградним' : 'повертається до прямого руху'}.`,
+        text: `${PLANETS[body].name} ${direct ? 'повертається до прямого руху' : 'стає ретроградним'}.`,
+        body,
+        direct,
       });
     }
   }
@@ -221,6 +255,7 @@ export function computeAstro(now: Date = new Date()): AstroReport {
   const hard = picked.filter((e) => e.tone === 'hard').length;
 
   return {
+    today: now,
     dateLabel: now.toLocaleDateString('uk-UA', { weekday: 'long', day: 'numeric', month: 'long' }),
     phase,
     lunarDay,

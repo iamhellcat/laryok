@@ -7,6 +7,12 @@ function splitHead(text: string) {
   return i < 0 ? { head: text, body: '' } : { head: text.slice(0, i), body: text.slice(i + 2) };
 }
 
+/** «сьогодні о 17:52» або «13 листопада о 17:52». */
+function when(d: Date, today: Date) {
+  const day = d.toDateString() === today.toDateString() ? 'сьогодні' : d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' });
+  return `${day} о ${clock(d)}`;
+}
+
 const clock = (d: Date) => d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
 
 /** Фаза Місяця: освітлена частина малюється з кута Сонце–Місяць (на північній півкулі зростаючий світиться справа). */
@@ -91,12 +97,15 @@ export function Astro({ onClose }: { onClose: () => void }) {
               {r.stations.map((st) => (
                 <p className="note" key={st.text}>О {clock(st.time)} {st.text}</p>
               ))}
-              {r.retrograde.map((text) => {
+              {r.retrograde.map(({ text, exit }) => {
                 const { head, body } = splitHead(text);
                 return (
-                  <p className="paper-text" key={head}>
-                    <b>{head}.</b> {body}
-                  </p>
+                  <div key={head}>
+                    <p className="paper-text">
+                      <b>{head}.</b> {body}
+                    </p>
+                    {exit && <p className="note">Вийде з ретроградності {when(exit, r.today)}.</p>}
+                  </div>
                 );
               })}
             </section>
