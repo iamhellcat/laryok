@@ -72,18 +72,6 @@ export function Astro({ onClose }: { onClose: () => void }) {
           </section>
 
           <section>
-            <h3>Аспекти дня</h3>
-            {r.events.length === 0 && <p className="paper-text">Сьогодні без гучних подій: спокійний космічний фон.</p>}
-            {r.main && <p className="paper-text"><b>{r.main}</b></p>}
-            {r.events.map((e) => (
-              <p className={`paper-text event ${e.tone}`} key={e.title + e.time.getTime()}>
-                <b>{clock(e.time)} · {e.title}.</b> {e.text}
-                {e.detail && <span className="detail">{e.detail}</span>}
-              </p>
-            ))}
-          </section>
-
-          <section>
             <h3>{sunSign.head}</h3>
             <p className="paper-text">{sunSign.body}</p>
             {r.sunIngress && (
@@ -111,7 +99,19 @@ export function Astro({ onClose }: { onClose: () => void }) {
             </section>
           )}
 
-          <p className="paper-tip">{r.summary}</p>
+          <section>
+            <h3>Висновки дня</h3>
+            {r.events.length === 0 && <p className="paper-text">Сьогодні без гучних подій: спокійний космічний фон.</p>}
+            {r.main && <p className="paper-text"><b>{r.main}</b></p>}
+            {r.events.map((e) => (
+              <p className={`paper-text event ${e.tone}`} key={e.title + e.time.getTime()}>
+                <b>{clock(e.time)} · {e.title}.</b> {e.text}
+                {e.detail && <span className="detail">{e.detail}</span>}
+              </p>
+            ))}
+            <p className="paper-tip">{r.summary}</p>
+          </section>
+
           <button className="reply done" onClick={onClose}>Гаразд</button>
         </div>
       </div>
