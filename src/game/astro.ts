@@ -1,6 +1,6 @@
 import { Body, EclipticGeoMoon, Ecliptic, GeoVector, MoonPhase, Observer, SearchMoonPhase, SearchRiseSet, SunPosition } from 'astronomy-engine';
 import {
-  ASPECTS, LUNAR_DAYS, MOON_IN_SIGN, PAIR_SPHERE, PLANETS, RETROGRADE_TEXT, SIGN_NAMES, SUN_IN_SIGN, SUN_MOON, MOON_SIGN_THESIS, PHASE_THESIS, SUN_SIGN_THESIS, type Tone,
+  LUNAR_DAYS, MOON_IN_SIGN, MOON_SIGN_THESIS, PHASE_THESIS, PLANET_NAMES, RETROGRADE_TEXT, SIGN_NAMES, SUN_IN_SIGN, SUN_SIGN_THESIS,
 } from '../data/astro';
 
 // Місячну добу рахуємо за сходом Місяця в Києві.
@@ -11,6 +11,14 @@ const DAY = 24 * HOUR;
 /** Планети, для яких показуємо ретроградність (Хірона в бібліотеці немає). */
 const MOVERS = [Body.Mercury, Body.Venus, Body.Mars, Body.Jupiter, Body.Saturn, Body.Uranus, Body.Neptune, Body.Pluto];
 
+/** Моменти фаз за кутом Місяць–Сонце. */
+const PHASE_MOMENTS: [number, string][] = [
+  [0, 'Новий місяць'],
+  [90, 'Перша чверть'],
+  [180, 'Повний місяць'],
+  [270, 'Остання чверть'],
+];
+
 const BODIES = [Body.Sun, Body.Moon, Body.Mercury, Body.Venus, Body.Mars, Body.Jupiter, Body.Saturn, Body.Uranus, Body.Neptune, Body.Pluto];
 
 export interface MoonPhaseInfo {
@@ -18,18 +26,6 @@ export interface MoonPhaseInfo {
   name: string;
   illumination: number;
   waxing: boolean;
-}
-
-export interface AspectEvent {
-  time: Date;
-  title: string;
-  /** Які планети в якому аспекті (для фазових подій немає). */
-  detail?: string;
-  text: string;
-  tone: Tone;
-  score: number;
-  /** Подія за участі Місяця (їх за добу багато, тому в газету беремо не більше трьох). */
-  moon: boolean;
 }
 
 export interface Ingress {
@@ -56,6 +52,8 @@ export interface AstroReport {
   today: Date;
   dateLabel: string;
   phase: MoonPhaseInfo;
+  /** Точний момент нового/повного місяця чи чверті, якщо він припадає на цю добу. */
+  phaseMoment: { time: Date; title: string } | null;
   lunarDay: { n: number; text: string };
   /** Текст з документа: перше речення — заголовок, далі опис. */
   moonSign: string;
@@ -67,16 +65,12 @@ export interface AstroReport {
   retrograde: RetrogradePlanet[];
   /** Планети, що протягом доби змінюють напрямок руху. */
   stations: Station[];
-  events: AspectEvent[];
-  /** «Головний аспект дня — …» */
-  main: string;
   /** Підсумок дня: три короткі тези (фаза Місяця, Сонце в знаку, Місяць у знаку). */
   theses: { label: string; text: string }[];
 }
 
 const norm360 = (a: number) => ((a % 360) + 360) % 360;
 const norm180 = (a: number) => ((a + 540) % 360) - 180;
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 function longitude(body: Body, t: Date): number {
   if (body === Body.Sun) return SunPosition(t).elon;
@@ -149,40 +143,17 @@ export function computeAstro(now: Date = new Date()): AstroReport {
     return { t, lon: BODIES.map((b) => longitude(b, t)) };
   });
 
-  const events: AspectEvent[] = [];
-  for (let i = 0; i < BODIES.length; i++) {
-    for (let j = i + 1; j < BODIES.length; j++) {
-      for (const aspect of ASPECTS) {
-        for (let k = 0; k < 24; k++) {
-          const d1 = norm180(samples[k].lon[j] - samples[k].lon[i] - aspect.angle);
-          const d2 = norm180(samples[k + 1].lon[j] - samples[k + 1].lon[i] - aspect.angle);
-          if (Math.abs(d1) > 30 || Math.abs(d2) > 30 || d1 * d2 > 0 || d1 === d2) continue;
-          const a = PLANETS[BODIES[i]];
-          const b = PLANETS[BODIES[j]];
-          const time = new Date(samples[k].t.getTime() + HOUR * (d1 / (d1 - d2)));
-          const phaseEvent = BODIES[i] === Body.Sun && BODIES[j] === Body.Moon ? SUN_MOON[aspect.angle] : undefined;
-          events.push({
-            time,
-            title: phaseEvent?.title ?? cap(PAIR_SPHERE[`${BODIES[i]}-${BODIES[j]}`]),
-            detail: phaseEvent ? undefined : `${cap(aspect.name)}: ${a.name} — ${b.name}`,
-            text: phaseEvent?.text ?? aspect.lines[(time.getHours() + i + j) % aspect.lines.length],
-            tone: aspect.tone,
-            score: phaseEvent ? 50 : a.weight + b.weight + aspect.weight,
-            moon: BODIES[i] === Body.Moon || BODIES[j] === Body.Moon,
-          });
-        }
-      }
+  // Точний момент фази: нового й повного місяця та чвертей — коли кут «Місяць мінус Сонце» дорівнює 0, 90, 180, 270.
+  let phaseMoment: AstroReport['phaseMoment'] = null;
+  const elongation = (k: number) => norm360(samples[k].lon[1] - samples[k].lon[0]);
+  for (const [angle, title] of PHASE_MOMENTS) {
+    for (let k = 0; k < 24; k++) {
+      const d1 = norm180(elongation(k) - angle);
+      const d2 = norm180(elongation(k + 1) - angle);
+      if (Math.abs(d1) > 30 || Math.abs(d2) > 30 || d1 * d2 > 0 || d1 === d2) continue;
+      phaseMoment = { time: new Date(samples[k].t.getTime() + HOUR * (d1 / (d1 - d2))), title };
     }
   }
-
-  // Місяць робить багато аспектів за добу, тож залишаємо найвагоміші й не більше трьох місячних.
-  let moonKept = 0;
-  const ranked = events
-    .sort((x, y) => y.score - x.score)
-    .filter((e) => !e.moon || ++moonKept <= 3)
-    .slice(0, 5);
-  const lead = ranked.find((e) => e.score < 50) ?? ranked[0];
-  const picked = [...ranked].sort((x, y) => x.time.getTime() - y.time.getTime());
 
   // Перехід у новий знак: знаходимо годину зміни, а потім уточнюємо до хвилин.
   const ingress = (bodyIndex: number): Ingress | null => {
@@ -244,7 +215,7 @@ export function computeAstro(now: Date = new Date()): AstroReport {
       if (direct && retroBodies.includes(body)) continue;
       stations.push({
         time: new Date(hi),
-        text: `${PLANETS[body].name} ${direct ? 'повертається до прямого руху' : 'стає ретроградним'}.`,
+        text: `${PLANET_NAMES[body]} ${direct ? 'повертається до прямого руху' : 'стає ретроградним'}.`,
         body,
         direct,
       });
@@ -261,6 +232,7 @@ export function computeAstro(now: Date = new Date()): AstroReport {
     today: now,
     dateLabel: now.toLocaleDateString('uk-UA', { weekday: 'long', day: 'numeric', month: 'long' }),
     phase,
+    phaseMoment,
     lunarDay,
     moonSign: MOON_IN_SIGN[moonIndex],
     moonIngress: ingress(1),
@@ -268,8 +240,6 @@ export function computeAstro(now: Date = new Date()): AstroReport {
     sunIngress: ingress(0),
     retrograde,
     stations,
-    events: picked,
-    main: lead ? `Головний аспект дня — ${lead.title.charAt(0).toLowerCase()}${lead.title.slice(1)}.` : '',
     theses: [
       { label: phase.name, text: PHASE_THESIS[phase.name] },
       { label: headOf(SUN_IN_SIGN[sunIndex]), text: SUN_SIGN_THESIS[sunIndex] },
