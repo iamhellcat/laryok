@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
-import { MERCURY_RETROGRADE } from '../data/astro';
 import { computeAstro, type MoonPhaseInfo } from '../game/astro';
+
+/** Ділить текст на заголовок (перше речення без крапки) і решту. */
+function splitHead(text: string) {
+  const i = text.indexOf('. ');
+  return i < 0 ? { head: text, body: '' } : { head: text.slice(0, i), body: text.slice(i + 2) };
+}
 
 const clock = (d: Date) => d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
 
@@ -22,6 +27,8 @@ function MoonIcon({ phase }: { phase: MoonPhaseInfo }) {
 export function Astro({ onClose }: { onClose: () => void }) {
   const r = useMemo(() => computeAstro(), []);
   const percent = Math.round(r.phase.illumination * 100);
+  const moonSign = splitHead(r.moonSign);
+  const sunSign = splitHead(r.sunSign);
   // Перше речення опису доби — жирним, решта звичайним текстом.
   const cut = r.lunarDay.text.indexOf('. ');
   const lunarLead = cut < 0 ? r.lunarDay.text : r.lunarDay.text.slice(0, cut + 1);
@@ -51,10 +58,10 @@ export function Astro({ onClose }: { onClose: () => void }) {
           </p>
 
           <section>
-            <h3>Місяць {r.moonSign.in}</h3>
-            <p className="paper-text">{r.moonSign.moon}</p>
+            <h3>{moonSign.head}</h3>
+            <p className="paper-text">{moonSign.body}</p>
             {r.moonIngress && (
-              <p className="note">О {clock(r.moonIngress.time)} Місяць переходить у знак «{r.moonIngress.sign.name}».</p>
+              <p className="note">О {clock(r.moonIngress.time)} Місяць переходить у знак «{r.moonIngress.sign}».</p>
             )}
           </section>
 
@@ -71,10 +78,29 @@ export function Astro({ onClose }: { onClose: () => void }) {
           </section>
 
           <section>
-            <h3>Сонце {r.sunSign.in}</h3>
-            {r.retrograde.length > 0 && <p className="note">Ретроградні: {r.retrograde.join(', ')}.</p>}
-            {r.mercuryRetrograde && <p className="paper-text">{MERCURY_RETROGRADE}</p>}
+            <h3>{sunSign.head}</h3>
+            <p className="paper-text">{sunSign.body}</p>
+            {r.sunIngress && (
+              <p className="note">О {clock(r.sunIngress.time)} Сонце переходить у знак «{r.sunIngress.sign}».</p>
+            )}
           </section>
+
+          {(r.retrograde.length > 0 || r.stations.length > 0) && (
+            <section>
+              <h3>Ретрогради</h3>
+              {r.stations.map((st) => (
+                <p className="note" key={st.text}>О {clock(st.time)} {st.text}</p>
+              ))}
+              {r.retrograde.map((text) => {
+                const { head, body } = splitHead(text);
+                return (
+                  <p className="paper-text" key={head}>
+                    <b>{head}.</b> {body}
+                  </p>
+                );
+              })}
+            </section>
+          )}
 
           <p className="paper-tip">{r.summary}</p>
           <button className="reply done" onClick={onClose}>Гаразд</button>

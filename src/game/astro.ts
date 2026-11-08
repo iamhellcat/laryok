@@ -1,10 +1,15 @@
 import { Body, EclipticGeoMoon, Ecliptic, GeoVector, MoonPhase, Observer, SearchMoonPhase, SearchRiseSet, SunPosition } from 'astronomy-engine';
-import { ASPECTS, LUNAR_DAYS, PAIR_SPHERE, PLANETS, SIGNS, SUN_MOON, TONE_SUMMARY, type Sign, type Tone } from '../data/astro';
+import {
+  ASPECTS, LUNAR_DAYS, MOON_IN_SIGN, PAIR_SPHERE, PLANETS, RETROGRADE_TEXT, SIGN_NAMES, SUN_IN_SIGN, SUN_MOON, TONE_SUMMARY, type Tone,
+} from '../data/astro';
 
 // Місячну добу рахуємо за сходом Місяця в Києві.
 const KYIV = new Observer(50.4501, 30.5234, 180);
 const HOUR = 3600_000;
 const DAY = 24 * HOUR;
+
+/** Планети, для яких показуємо ретроградність (Хірона в бібліотеці немає). */
+const MOVERS = [Body.Mercury, Body.Venus, Body.Mars, Body.Jupiter, Body.Saturn, Body.Uranus, Body.Neptune, Body.Pluto];
 
 const BODIES = [Body.Sun, Body.Moon, Body.Mercury, Body.Venus, Body.Mars, Body.Jupiter, Body.Saturn, Body.Uranus, Body.Neptune, Body.Pluto];
 
@@ -27,15 +32,30 @@ export interface AspectEvent {
   moon: boolean;
 }
 
+export interface Ingress {
+  time: Date;
+  sign: string;
+}
+
+export interface Station {
+  time: Date;
+  text: string;
+}
+
 export interface AstroReport {
   dateLabel: string;
   phase: MoonPhaseInfo;
   lunarDay: { n: number; text: string };
-  moonSign: Sign;
-  moonIngress: { time: Date; sign: Sign } | null;
-  sunSign: Sign;
+  /** Текст з документа: перше речення — заголовок, далі опис. */
+  moonSign: string;
+  sunSign: string;
+  /** Якщо протягом доби Місяць чи Сонце переходить в інший знак. */
+  moonIngress: Ingress | null;
+  sunIngress: Ingress | null;
+  /** Планети, які зараз ретроградні, з описами. */
   retrograde: string[];
-  mercuryRetrograde: boolean;
+  /** Планети, що протягом доби змінюють напрямок руху. */
+  stations: Station[];
   events: AspectEvent[];
   /** «Головний аспект дня — …» */
   main: string;
@@ -152,20 +172,50 @@ export function computeAstro(now: Date = new Date()): AstroReport {
   const lead = ranked.find((e) => e.score < 50) ?? ranked[0];
   const picked = [...ranked].sort((x, y) => x.time.getTime() - y.time.getTime());
 
-  let moonIngress: AstroReport['moonIngress'] = null;
-  for (let k = 0; k < 24; k++) {
-    const a = signIndex(samples[k].lon[1]);
-    const b = signIndex(samples[k + 1].lon[1]);
-    if (a !== b) {
-      moonIngress = { time: new Date(samples[k].t.getTime() + HOUR / 2), sign: SIGNS[b] };
-      break;
+  // Перехід у новий знак: знаходимо годину зміни, а потім уточнюємо до хвилин.
+  const ingress = (bodyIndex: number): Ingress | null => {
+    const body = BODIES[bodyIndex];
+    for (let k = 0; k < 24; k++) {
+      const from = signIndex(samples[k].lon[bodyIndex]);
+      const to = signIndex(samples[k + 1].lon[bodyIndex]);
+      if (from === to) continue;
+      let lo = samples[k].t.getTime();
+      let hi = samples[k + 1].t.getTime();
+      for (let i = 0; i < 16; i++) {
+        const mid = (lo + hi) / 2;
+        if (signIndex(longitude(body, new Date(mid))) === from) lo = mid;
+        else hi = mid;
+      }
+      return { time: new Date(hi), sign: SIGN_NAMES[to] };
+    }
+    return null;
+  };
+
+  // Ретроградність: швидкість планети за довготою. Знак змінюється в «стоянці» (station).
+  const velocity = (body: Body, t: Date) =>
+    norm180(longitude(body, new Date(t.getTime() + HOUR / 2)) - longitude(body, new Date(t.getTime() - HOUR / 2)));
+
+  const retrograde = MOVERS.filter((b) => velocity(b, now) < 0).map((b) => RETROGRADE_TEXT[b]);
+
+  const stations: Station[] = [];
+  for (const body of MOVERS) {
+    const v = samples.map((s) => velocity(body, s.t));
+    for (let k = 0; k < 24; k++) {
+      if (Math.sign(v[k]) === Math.sign(v[k + 1])) continue;
+      let lo = samples[k].t.getTime();
+      let hi = samples[k + 1].t.getTime();
+      for (let i = 0; i < 16; i++) {
+        const mid = (lo + hi) / 2;
+        if (Math.sign(velocity(body, new Date(mid))) === Math.sign(v[k])) lo = mid;
+        else hi = mid;
+      }
+      stations.push({
+        time: new Date(hi),
+        text: `${PLANETS[body].name} ${v[k + 1] < 0 ? 'стає ретроградним' : 'повертається до прямого руху'}.`,
+      });
     }
   }
-
-  const planetNames = [Body.Mercury, Body.Venus, Body.Mars, Body.Jupiter, Body.Saturn];
-  const retrograde = planetNames
-    .filter((b) => norm180(longitude(b, new Date(now.getTime() + DAY)) - longitude(b, new Date(now.getTime() - DAY))) < 0)
-    .map((b) => PLANETS[b].name);
+  stations.sort((a, b) => a.time.getTime() - b.time.getTime());
 
   const soft = picked.filter((e) => e.tone === 'soft').length;
   const hard = picked.filter((e) => e.tone === 'hard').length;
@@ -174,11 +224,12 @@ export function computeAstro(now: Date = new Date()): AstroReport {
     dateLabel: now.toLocaleDateString('uk-UA', { weekday: 'long', day: 'numeric', month: 'long' }),
     phase,
     lunarDay,
-    moonSign: SIGNS[signIndex(longitude(Body.Moon, now))],
-    moonIngress,
-    sunSign: SIGNS[signIndex(longitude(Body.Sun, now))],
+    moonSign: MOON_IN_SIGN[signIndex(longitude(Body.Moon, now))],
+    moonIngress: ingress(1),
+    sunSign: SUN_IN_SIGN[signIndex(longitude(Body.Sun, now))],
+    sunIngress: ingress(0),
     retrograde,
-    mercuryRetrograde: retrograde.includes(PLANETS.Mercury.name),
+    stations,
     events: picked,
     main: lead ? `Головний аспект дня — ${lead.title.charAt(0).toLowerCase()}${lead.title.slice(1)}.` : '',
     summary: TONE_SUMMARY[soft > hard ? 'soft' : hard > soft ? 'hard' : 'neutral'],
