@@ -22,6 +22,10 @@ function MoonIcon({ phase }: { phase: MoonPhaseInfo }) {
 export function Astro({ onClose }: { onClose: () => void }) {
   const r = useMemo(() => computeAstro(), []);
   const percent = Math.round(r.phase.illumination * 100);
+  // Перше речення опису доби — жирним, решта звичайним текстом.
+  const cut = r.lunarDay.text.indexOf('. ');
+  const lunarLead = cut < 0 ? r.lunarDay.text : r.lunarDay.text.slice(0, cut + 1);
+  const lunarBody = cut < 0 ? '' : r.lunarDay.text.slice(cut + 2);
 
   return (
     <>
@@ -39,11 +43,11 @@ export function Astro({ onClose }: { onClose: () => void }) {
             <MoonIcon phase={r.phase} />
             <div>
               <h3>{r.phase.name}</h3>
-              <p className="note">{percent}% освітлення · {r.lunarDay.n}-та місячна доба</p>
+              <p className="note">{percent}% освітлення · {r.lunarDay.n} місячна доба</p>
             </div>
           </section>
           <p className="paper-text">
-            <b>{r.lunarDay.title}.</b> Сприятливо: {r.lunarDay.good}. Краще уникати: {r.lunarDay.avoid}.
+            <b>{lunarLead}</b> {lunarBody}
           </p>
 
           <section>

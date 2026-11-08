@@ -1,5 +1,5 @@
 import { Body, EclipticGeoMoon, Ecliptic, GeoVector, MoonPhase, Observer, SearchMoonPhase, SearchRiseSet, SunPosition } from 'astronomy-engine';
-import { ASPECTS, LUNAR_DAYS, PAIR_SPHERE, PLANETS, SIGNS, SUN_MOON, TONE_SUMMARY, type LunarDay, type Sign, type Tone } from '../data/astro';
+import { ASPECTS, LUNAR_DAYS, PAIR_SPHERE, PLANETS, SIGNS, SUN_MOON, TONE_SUMMARY, type Sign, type Tone } from '../data/astro';
 
 // Місячну добу рахуємо за сходом Місяця в Києві.
 const KYIV = new Observer(50.4501, 30.5234, 180);
@@ -30,7 +30,7 @@ export interface AspectEvent {
 export interface AstroReport {
   dateLabel: string;
   phase: MoonPhaseInfo;
-  lunarDay: LunarDay & { n: number };
+  lunarDay: { n: number; text: string };
   moonSign: Sign;
   moonIngress: { time: Date; sign: Sign } | null;
   sunSign: Sign;
@@ -108,7 +108,7 @@ export function computeAstro(now: Date = new Date()): AstroReport {
   };
 
   const n = lunarDayNumber(now);
-  const lunarDay = { n, ...LUNAR_DAYS[n - 1] };
+  const lunarDay = { n, text: LUNAR_DAYS[n - 1] };
 
   // Сканування доби по годинах: точні аспекти, вхід Місяця в знак.
   const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
