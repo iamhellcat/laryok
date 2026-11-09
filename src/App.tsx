@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Bird } from './components/Bird';
 import { CoinCounter } from './components/CoinCounter';
 import { DailyPush } from './components/DailyPush';
@@ -35,6 +35,33 @@ export default function App() {
   const [push, setPush] = useState(wallet.push);
   const [ui, setUi] = useState<Ui>({ kind: 'idle' });
   const [hover, setHover] = useState(false);
+
+  // Під час розмови сцена трохи їде вгору рівно настільки, щоб персонаж лишався над діалогом.
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [lift, setLift] = useState(0);
+  const talking = ui.kind === 'dialog';
+  useEffect(() => {
+    const stage = stageRef.current;
+    const scene = stage?.querySelector<HTMLElement>('.scene');
+    const dialog = stage?.querySelector<HTMLElement>('.dialog');
+    if (!talking || !stage || !scene || !dialog) return;
+    const spot = art(`characters/${character.id}/${character.id}_neutral`);
+    const measure = () => {
+      const sceneH = scene.offsetHeight;
+      const base = (stage.clientHeight - sceneH) / 2; // верх сцени без зсуву
+      const top = base + ((spot.y ?? 0) / CANVAS.h) * sceneH;
+      const bottom = top + (spot.h / CANVAS.h) * sceneH;
+      const gap = stage.clientWidth * 0.02;
+      const need = bottom + gap - dialog.offsetTop;
+      // Не піднімаємо персонажа вище за 12% висоти екрана.
+      setLift(Math.max(0, Math.min(need, top - stage.clientHeight * 0.12)));
+    };
+    measure();
+    const watcher = new ResizeObserver(measure);
+    watcher.observe(dialog);
+    watcher.observe(stage);
+    return () => watcher.disconnect();
+  }, [talking]);
 
   // Кіт міняє спрайти довільно: раз на кілька секунд випадає один із його настроїв.
   const [wander, setWander] = useState<Mood>('neutral');
@@ -112,7 +139,7 @@ export default function App() {
         : [];
 
   return (
-    <div className="stage">
+    <div ref={stageRef} className="stage" style={{ '--lift': `${talking ? lift : 0}px` } as CSSProperties}>
       <div className="scene">
         <Layer name="background" />
         <Bird />

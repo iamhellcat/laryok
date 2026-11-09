@@ -75,7 +75,8 @@ button {
   top: 50%;
   width: var(--uw);
   aspect-ratio: 1206 / 2622;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, calc(-50% - var(--lift, 0px)));
+  transition: transform 0.4s cubic-bezier(0.3, 0.7, 0.3, 1);
   container-type: inline-size;
   user-select: none;
   -webkit-user-select: none;
@@ -95,6 +96,12 @@ button {
 }
 .ui > * {
   pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene {
+    transition: none;
+  }
 }
 
 @media (max-aspect-ratio: 62 / 100) {
