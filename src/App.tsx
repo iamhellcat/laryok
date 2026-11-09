@@ -18,8 +18,9 @@ const character = characterForToday();
 
 type Ui =
   | { kind: 'idle' }
-  | { kind: 'dialog'; say: string; mood: Mood; menu: boolean; replies: Reply[] }
-  | { kind: 'oracle'; system: SystemId };
+  // path — репліка, якою розмова дійшла до вибору пророцтв; від неї залежить тон фрази «що ще?» після ворожіння.
+  | { kind: 'dialog'; say: string; mood: Mood; menu: boolean; replies: Reply[]; path: string }
+  | { kind: 'oracle'; system: SystemId; path: string };
 
 const PRODUCTS = [
   'tarot/tarot_button',
@@ -57,6 +58,7 @@ export default function App() {
       mood: node.mood,
       menu: node.replies === 'menu',
       replies: node.replies === 'menu' ? [] : node.replies,
+      path: id,
     });
   };
 
@@ -71,7 +73,24 @@ export default function App() {
       return;
     }
     if (system === 'astro') spend();
-    setUi({ kind: 'oracle', system });
+    setUi({ kind: 'oracle', system, path: ui.kind === 'dialog' ? ui.path : character.start });
+  };
+
+  // Після ворожіння персонаж не мовчить, а питає «що ще?» тим самим тоном; без монет — каже, що їх нема.
+  const afterOracle = (path: string) => {
+    if (balance < 1) {
+      sayNode('broke');
+      return;
+    }
+    const node = character.nodes[path];
+    setUi({
+      kind: 'dialog',
+      say: node.after ?? character.nodes[character.start].after ?? node.say,
+      mood: node.mood,
+      menu: true,
+      replies: [],
+      path,
+    });
   };
 
   const spend = () => {
@@ -136,7 +155,7 @@ export default function App() {
         )}
 
         {ui.kind === 'oracle' && (
-          <Oracle system={ui.system} character={character} onReveal={spend} onClose={() => setUi({ kind: 'idle' })} />
+          <Oracle system={ui.system} character={character} onReveal={spend} onClose={() => afterOracle(ui.path)} />
         )}
 
         {push && <DailyPush push={push} onClose={() => setPush(null)} />}

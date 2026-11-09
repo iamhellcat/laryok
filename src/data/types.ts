@@ -13,6 +13,8 @@ export interface DialogNode {
   mood: Mood;
   /** 'menu' — після цієї репліки одразу вибір пророцтв. */
   replies: Reply[] | 'menu';
+  /** Що персонаж каже після ворожіння, якщо розмова пішла через цю репліку («Що ще хочеш?» у відповідному тоні). */
+  after?: string;
 }
 
 export type CharacterId = 'babka' | 'cat';

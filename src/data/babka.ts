@@ -22,6 +22,7 @@ export const babka: Character = {
     start: {
       say: 'Чого тобі?',
       mood: 'neutral',
+      after: 'Ну, чого ще?',
       replies: [
         { label: 'Не дуже-то люб’язно!', next: 'rude' },
         { label: 'Що така красуня тут робить?', next: 'flirt' },
@@ -31,11 +32,13 @@ export const babka: Character = {
     rude: {
       say: 'Мені не доплачують за посмішки. Кажи швидше, я на перекур хочу.',
       mood: 'grumpy',
+      after: 'Ще щось? Я, між іншим, на перекур збиралась.',
       replies: 'menu',
     },
     flirt: {
       say: 'Та всяке різне: гарнюням каву варю і пророцтва видаю. Чого хочеш, зайчику?',
       mood: 'happy',
+      after: 'Ну що, зайчику, ще щось погадаємо?',
       replies: 'menu',
     },
     broke: {

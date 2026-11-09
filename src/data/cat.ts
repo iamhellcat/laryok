@@ -9,6 +9,7 @@ export const cat: Character = {
     start: {
       say: 'Мур-мур, що цікавить?',
       mood: 'neutral',
+      after: 'Мур. Що ще?',
       replies: [
         { label: 'Ти розмовляєш?', next: 'talk' },
         { label: 'А де м-м-м інші продавці?', next: 'others' },
@@ -18,11 +19,13 @@ export const cat: Character = {
     talk: {
       say: 'Ну так, мрр мяу. Ти що, расист? Кажи швиденько, що треба, в мене денний сон за планом.',
       mood: 'neutral',
+      after: 'Мр-р? Ще щось, чи я вже можу спати?',
       replies: 'menu',
     },
     others: {
       say: 'Я за них. Думаєш, якщо в мене лапки, я карти не зможу помішати? Обирай, на чому погадаємо.',
       mood: 'happy',
+      after: 'Ну що, ще помішаємо карти? Обирай.',
       replies: 'menu',
     },
     broke: {
