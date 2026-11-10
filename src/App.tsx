@@ -19,7 +19,8 @@ const character = characterForToday();
 type Ui =
   | { kind: 'idle' }
   // path — репліка, якою розмова дійшла до вибору пророцтв; від неї залежить тон фрази «що ще?» після ворожіння.
-  | { kind: 'dialog'; say: string; mood: Mood; menu: boolean; replies: Reply[]; path: string }
+  // then — настрій, на який персонаж перемикається посеред репліки (див. DialogNode.thenMood).
+  | { kind: 'dialog'; say: string; mood: Mood; then?: Mood; menu: boolean; replies: Reply[]; path: string }
   | { kind: 'oracle'; system: SystemId; path: string };
 
 const PRODUCTS = [
@@ -77,12 +78,24 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Репліка зі зміною настрою: за мить після початку персонаж міняє спрайт.
+  const thenMood = ui.kind === 'dialog' ? ui.then : undefined;
+  const spoken = ui.kind === 'dialog' ? ui.say : '';
+  useEffect(() => {
+    if (!thenMood) return;
+    const timer = setTimeout(() => {
+      setUi((u) => (u.kind === 'dialog' && u.then ? { ...u, mood: u.then, then: undefined } : u));
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, [thenMood, spoken]);
+
   const sayNode = (id: string) => {
     const node = character.nodes[id];
     setUi({
       kind: 'dialog',
       say: node.say,
       mood: node.mood,
+      then: node.thenMood,
       menu: node.replies === 'menu',
       replies: node.replies === 'menu' ? [] : node.replies,
       path: id,

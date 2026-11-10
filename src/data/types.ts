@@ -11,13 +11,15 @@ export interface Reply {
 export interface DialogNode {
   say: string;
   mood: Mood;
+  /** Якщо задано, під час репліки персонаж міняє настрій з `mood` на цей (студент: усміхнувся, а потім засмутився). */
+  thenMood?: Mood;
   /** 'menu' — після цієї репліки одразу вибір пророцтв. */
   replies: Reply[] | 'menu';
   /** Що персонаж каже після ворожіння, якщо розмова пішла через цю репліку («Що ще хочеш?» у відповідному тоні). */
   after?: string;
 }
 
-export type CharacterId = 'babka' | 'cat';
+export type CharacterId = 'babka' | 'cat' | 'student';
 
 export interface Character {
   id: CharacterId;
