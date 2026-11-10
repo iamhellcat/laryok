@@ -4,10 +4,10 @@ import { student } from './student';
 import type { Character } from './types';
 
 /** Порядок зміни персонажів по днях. */
-export const CHARACTERS: Character[] = [babka, cat, student];
+export const CHARACTERS: Character[] = [student, babka, cat];
 
-/** Перший день гри: чергує бабку, кота, студента, ... далі по колу. */
-const FIRST_DAY = new Date(2026, 10, 2);
+/** Перший день відліку, 11 листопада 2026: студент, далі бабка, кіт і так по колу. */
+const FIRST_DAY = new Date(2026, 10, 11);
 
 const midnight = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 
