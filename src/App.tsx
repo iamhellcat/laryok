@@ -4,11 +4,14 @@ import { CoinCounter } from './components/CoinCounter';
 import { DailyPush } from './components/DailyPush';
 import { Dialog } from './components/Dialog';
 import { Layer } from './components/Layer';
+import type { CoffeeRun } from './components/Coffee';
 import { Oracle } from './components/Oracles';
 import { art, CANVAS, hasArt } from './art';
 import { READY_SYSTEMS, SYSTEM_LABELS, SYSTEM_ORDER } from './data/babka';
 import { characterForToday } from './data/characters';
+import { COFFEE_TOPICS, type CoffeeTopic } from './data/coffee';
 import type { Mood, Reply, SystemId } from './data/types';
+import { todaysCoffee } from './game/coffee';
 import { loadWallet, saveBalance } from './game/wallet';
 
 // Читаємо гаманець один раз при запуску, щоб щоденні монети нарахувалися рівно раз.
@@ -21,7 +24,7 @@ type Ui =
   // path — репліка, якою розмова дійшла до вибору пророцтв; від неї залежить тон фрази «що ще?» після ворожіння.
   // then — настрій, на який персонаж перемикається посеред репліки (див. DialogNode.thenMood).
   | { kind: 'dialog'; say: string; mood: Mood; then?: Mood; menu: boolean; replies: Reply[]; path: string }
-  | { kind: 'oracle'; system: SystemId; path: string };
+  | { kind: 'oracle'; system: SystemId; path: string; coffee?: CoffeeRun };
 
 const PRODUCTS = [
   'tarot/tarot_button',
@@ -104,10 +107,40 @@ export default function App() {
 
   const reply = (r: Reply) => {
     if (r.next === 'menu' && ui.kind === 'dialog') setUi({ ...ui, menu: true, replies: [] });
-    else sayNode(r.next);
+    else if (r.next.startsWith('coffee:')) {
+      const arg = r.next.slice('coffee:'.length);
+      const coffee: CoffeeRun = arg === 'again' ? { mode: 'again' } : { mode: 'new', topic: arg as CoffeeTopic };
+      setUi({ kind: 'oracle', system: 'coffee', path: ui.kind === 'dialog' ? ui.path : character.start, coffee });
+    } else sayNode(r.next);
+  };
+
+  // Репліка поза сценарієм діалогу (питання про тему кави, «кава вже була»), розмова лишається на тій самій гілці.
+  const talk = (say: string, mood: Mood, replies: Reply[]) => {
+    setUi({ kind: 'dialog', say, mood, menu: false, replies, path: ui.kind === 'dialog' ? ui.path : character.start });
+  };
+
+  // Кава раз на день: вдруге персонаж відмовляє, але можна перечитати сьогоднішній розклад (без монети).
+  const chooseCoffee = () => {
+    const voice = character.coffee;
+    if (todaysCoffee()) {
+      talk(voice.used, voice.usedMood, [
+        { label: 'Перечитати сьогоднішнє', next: 'coffee:again' },
+        { label: 'Обрати щось інше', next: 'menu' },
+      ]);
+      return;
+    }
+    if (balance < 1) {
+      sayNode('broke');
+      return;
+    }
+    talk(voice.ask, 'neutral', COFFEE_TOPICS.map((t) => ({ label: t.label, next: `coffee:${t.id}` })));
   };
 
   const choose = (system: SystemId) => {
+    if (system === 'coffee') {
+      chooseCoffee();
+      return;
+    }
     if (balance < 1) {
       sayNode('broke');
       return;
@@ -117,8 +150,8 @@ export default function App() {
   };
 
   // Після ворожіння персонаж не мовчить, а питає «що ще?» тим самим тоном; без монет — каже, що їх нема.
-  const afterOracle = (path: string) => {
-    if (balance < 1) {
+  const afterOracle = (path: string, free = false) => {
+    if (balance < 1 && !free) {
       sayNode('broke');
       return;
     }
@@ -195,7 +228,13 @@ export default function App() {
         )}
 
         {ui.kind === 'oracle' && (
-          <Oracle system={ui.system} character={character} onReveal={spend} onClose={() => afterOracle(ui.path)} />
+          <Oracle
+            system={ui.system}
+            character={character}
+            coffee={ui.coffee}
+            onReveal={spend}
+            onClose={() => afterOracle(ui.path, ui.coffee?.mode === 'again')}
+          />
         )}
 
         {push && <DailyPush push={push} onClose={() => setPush(null)} />}

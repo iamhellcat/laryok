@@ -60,6 +60,27 @@
    "w": 279,
    "h": 339
   },
+  "coffee/coffe_stick1": {
+   "src": "/art/coffee/coffe_stick1.webp",
+   "x": 576,
+   "y": 663,
+   "w": 469,
+   "h": 493
+  },
+  "coffee/coffe_stick2": {
+   "src": "/art/coffee/coffe_stick2.webp",
+   "x": 570,
+   "y": 656,
+   "w": 475,
+   "h": 500
+  },
+  "coffee/coffe_stick3": {
+   "src": "/art/coffee/coffe_stick3.webp",
+   "x": 597,
+   "y": 692,
+   "w": 448,
+   "h": 464
+  },
   "coffee/coffee_button": {
    "src": "/art/coffee/coffee_button.webp",
    "x": 882,
@@ -69,9 +90,9 @@
   },
   "coffee/cup": {
    "src": "/art/coffee/cup.webp",
-   "x": 302,
+   "x": 304,
    "y": 1062,
-   "w": 637,
+   "w": 634,
    "h": 548
   },
   "coffee/cup_back": {
@@ -80,6 +101,230 @@
    "y": 1062,
    "w": 637,
    "h": 548
+  },
+  "coffee/cup_empthy1": {
+   "src": "/art/coffee/cup_empthy1.webp",
+   "x": 343,
+   "y": 1155,
+   "w": 404,
+   "h": 454
+  },
+  "coffee/cup_empthy2": {
+   "src": "/art/coffee/cup_empthy2.webp",
+   "x": 343,
+   "y": 1155,
+   "w": 404,
+   "h": 454
+  },
+  "coffee/cup_with_coffee": {
+   "src": "/art/coffee/cup_with_coffee.webp",
+   "x": 343,
+   "y": 1155,
+   "w": 404,
+   "h": 454
+  },
+  "coffee/mountain": {
+   "src": "/art/coffee/mountain.webp",
+   "x": 514,
+   "y": 1299,
+   "w": 94,
+   "h": 90
+  },
+  "coffee/tree": {
+   "src": "/art/coffee/tree.webp",
+   "x": 462,
+   "y": 1286,
+   "w": 111,
+   "h": 105
+  },
+  "coffee/house": {
+   "src": "/art/coffee/house.webp",
+   "x": 534,
+   "y": 1294,
+   "w": 80,
+   "h": 100
+  },
+  "coffee/snake": {
+   "src": "/art/coffee/snake.webp",
+   "x": 392,
+   "y": 1206,
+   "w": 144,
+   "h": 75
+  },
+  "coffee/star": {
+   "src": "/art/coffee/star.webp",
+   "x": 517,
+   "y": 1417,
+   "w": 55,
+   "h": 51
+  },
+  "coffee/ring": {
+   "src": "/art/coffee/ring.webp",
+   "x": 385,
+   "y": 1355,
+   "w": 68,
+   "h": 98
+  },
+  "coffee/key": {
+   "src": "/art/coffee/key.webp",
+   "x": 753,
+   "y": 1282,
+   "w": 45,
+   "h": 88
+  },
+  "coffee/comet": {
+   "src": "/art/coffee/comet.webp",
+   "x": 545,
+   "y": 1220,
+   "w": 107,
+   "h": 142
+  },
+  "coffee/clover": {
+   "src": "/art/coffee/clover.webp",
+   "x": 558,
+   "y": 1103,
+   "w": 138,
+   "h": 138
+  },
+  "coffee/ship": {
+   "src": "/art/coffee/ship.webp",
+   "x": 626,
+   "y": 1279,
+   "w": 89,
+   "h": 71
+  },
+  "coffee/crown": {
+   "src": "/art/coffee/crown.webp",
+   "x": 525,
+   "y": 1302,
+   "w": 94,
+   "h": 71
+  },
+  "coffee/scythe": {
+   "src": "/art/coffee/scythe.webp",
+   "x": 537,
+   "y": 1264,
+   "w": 86,
+   "h": 147
+  },
+  "coffee/dot": {
+   "src": "/art/coffee/dot.webp",
+   "x": 601,
+   "y": 1412,
+   "w": 42,
+   "h": 40
+  },
+  "coffee/letter": {
+   "src": "/art/coffee/letter.webp",
+   "x": 577,
+   "y": 1287,
+   "w": 97,
+   "h": 104
+  },
+  "coffee/lightning": {
+   "src": "/art/coffee/lightning.webp",
+   "x": 563,
+   "y": 1267,
+   "w": 54,
+   "h": 98
+  },
+  "coffee/moon": {
+   "src": "/art/coffee/moon.webp",
+   "x": 453,
+   "y": 1253,
+   "w": 110,
+   "h": 156
+  },
+  "coffee/scissors": {
+   "src": "/art/coffee/scissors.webp",
+   "x": 491,
+   "y": 1263,
+   "w": 81,
+   "h": 134
+  },
+  "coffee/eye": {
+   "src": "/art/coffee/eye.webp",
+   "x": 598,
+   "y": 1313,
+   "w": 60,
+   "h": 87
+  },
+  "coffee/eagle": {
+   "src": "/art/coffee/eagle.webp",
+   "x": 498,
+   "y": 1290,
+   "w": 167,
+   "h": 60
+  },
+  "coffee/spot1": {
+   "src": "/art/coffee/spot1.webp",
+   "x": 541,
+   "y": 1280,
+   "w": 114,
+   "h": 115
+  },
+  "coffee/spot2": {
+   "src": "/art/coffee/spot2.webp",
+   "x": 509,
+   "y": 1155,
+   "w": 176,
+   "h": 108
+  },
+  "coffee/spot3": {
+   "src": "/art/coffee/spot3.webp",
+   "x": 444,
+   "y": 1218,
+   "w": 144,
+   "h": 171
+  },
+  "coffee/spot4": {
+   "src": "/art/coffee/spot4.webp",
+   "x": 520,
+   "y": 1232,
+   "w": 201,
+   "h": 81
+  },
+  "coffee/spot5": {
+   "src": "/art/coffee/spot5.webp",
+   "x": 517,
+   "y": 1351,
+   "w": 194,
+   "h": 137
+  },
+  "coffee/fish": {
+   "src": "/art/coffee/fish.webp",
+   "x": 559,
+   "y": 1288,
+   "w": 64,
+   "h": 102
+  },
+  "coffee/heart": {
+   "src": "/art/coffee/heart.webp",
+   "x": 682,
+   "y": 1390,
+   "w": 58,
+   "h": 53
+  },
+  "coffee/sun": {
+   "src": "/art/coffee/sun.webp",
+   "x": 597,
+   "y": 1275,
+   "w": 110,
+   "h": 98
+  },
+  "coffee/cloud": {
+   "src": "/art/coffee/cloud.webp",
+   "x": 539,
+   "y": 1196,
+   "w": 133,
+   "h": 68
+  },
+  "coffee/anchor": {
+   "src": "/art/coffee/anchor.webp",
+   "x": 537,
+   "y": 1302,
+   "w": 77,
+   "h": 90
   },
   "i-tsin/flip_a_coin": {
    "src": "/art/i-tsin/flip_a_coin.webp",
@@ -601,6 +846,13 @@
    "y": 1280,
    "w": 227,
    "h": 249
+  },
+  "coffee/liquid": {
+   "src": "/art/coffee/liquid.webp",
+   "x": 356,
+   "y": 1197,
+   "w": 374,
+   "h": 69
   }
  }
 }

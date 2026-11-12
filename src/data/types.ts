@@ -21,12 +21,28 @@ export interface DialogNode {
 
 export type CharacterId = 'babka' | 'cat' | 'student';
 
+/** Фрази персонажа для ворожіння на Маккохфе. */
+export interface CoffeeVoice {
+  /** «Що саме цікавить?», далі кнопки з темами. */
+  ask: string;
+  /** Що каже, якщо кава сьогодні вже була. */
+  used: string;
+  usedMood: Mood;
+  /** Початок тлумачення. */
+  intro: string;
+  /** Підводки до символів: на дні, на стінках, на краях. */
+  leads: [string, string, string];
+  /** Завершення тлумачення. */
+  outro: string;
+}
+
 export interface Character {
   id: CharacterId;
   start: string;
   /** Якщо задано, спрайт персонажа довільно міняється між цими настроями (кіт). */
   wanderMoods?: Mood[];
   nodes: Record<string, DialogNode>;
+  coffee: CoffeeVoice;
   /** Тлумачення арканів Таро від цього персонажа. */
   tarot: Record<import('./tarot').TarotCard, string>;
 }

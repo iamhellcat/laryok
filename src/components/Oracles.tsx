@@ -2,10 +2,11 @@ import { useState, type ReactNode } from 'react';
 import { art } from '../art';
 import { HEXAGRAMS, type Hexagram } from '../data/iching';
 import { MO_READINGS, MO_SYLLABLES } from '../data/mo';
-import { COFFEE_SYMBOLS, MAGIC_BALL_ANSWERS, type CoffeeSymbol } from '../data/oracles';
+import { MAGIC_BALL_ANSWERS } from '../data/oracles';
 import { splitReading, TAROT_CARDS, tarotArtKey, type TarotCard } from '../data/tarot';
 import type { Character, SystemId } from '../data/types';
 import { Astro } from './Astro';
+import { CoffeeRitual, type CoffeeRun } from './Coffee';
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
@@ -57,6 +58,8 @@ function RevealOracle<T>({ roll, back, result, onReveal, onClose, label }: Revea
 
 interface OracleProps {
   character: Character;
+  /** Для ворожіння на каві: нове за темою чи перечитування. */
+  coffee?: CoffeeRun;
   onReveal: () => void;
   onClose: () => void;
 }
@@ -115,31 +118,6 @@ function Ball({ onReveal, onClose }: OracleProps) {
 const pos = (r: { left: number; width: number; top: number; height: number }) => ({
   left: `${r.left}%`, width: `${r.width}%`, top: `${r.top}%`, height: `${r.height}%`,
 });
-
-function Coffee({ onReveal, onClose }: OracleProps) {
-  return (
-    <RevealOracle<CoffeeSymbol[]>
-      label="Ворожіння на Маккохфе"
-      roll={() => {
-        const first = pick(COFFEE_SYMBOLS);
-        return [first, pick(COFFEE_SYMBOLS.filter((s) => s !== first))];
-      }}
-      onReveal={onReveal}
-      onClose={onClose}
-      back={<Img name="coffee/cup_back" className="cup" />}
-      result={(symbols) => (
-        <>
-          <Img name="coffee/cup" className="cup" />
-          {symbols.map((s) => (
-            <p className="symbol" key={s.name}>
-              <b>{s.name}</b> — {s.meaning}
-            </p>
-          ))}
-        </>
-      )}
-    />
-  );
-}
 
 /** Шість ліній гексаграми знизу вгору: суцільна — ян, перервана — інь. */
 function HexagramLines({ lines }: { lines: number[] }) {
@@ -206,7 +184,7 @@ export function Oracle({ system, ...props }: OracleProps & { system: SystemId })
   switch (system) {
     case 'tarot': return <Tarot {...props} />;
     case 'ball': return <Ball {...props} />;
-    case 'coffee': return <Coffee {...props} />;
+    case 'coffee': return <CoffeeRitual character={props.character} run={props.coffee ?? { mode: 'new', topic: 'events' }} onReveal={props.onReveal} onClose={props.onClose} />;
     case 'iching': return <IChing {...props} />;
     case 'mo': return <Mo {...props} />;
     case 'astro': return <Astro onClose={props.onClose} />;

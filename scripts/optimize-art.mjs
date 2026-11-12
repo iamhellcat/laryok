@@ -69,9 +69,22 @@ const CANVAS = { w: 1206, h: 2622 };
 const files = globSync('Arts/**/*.{PNG,jpg}').filter((f) => !f.endsWith('sample.PNG')).sort();
 const manifest = { canvas: CANVAS, art: {} };
 
+// Символи й плями для кави названі кирилицею. У коді й на сервері вони під латинськими іменами.
+const COFFEE_SLUGS = {
+  гора: 'mountain', дерево: 'tree', дім: 'house', змія: 'snake', зірка: 'star', каблучка: 'ring', ключ: 'key',
+  комета: 'comet', конюшина: 'clover', корабель: 'ship', корона: 'crown', коса: 'scythe', крапка: 'dot',
+  лист: 'letter', молнія: 'lightning', місяць: 'moon', ножиці: 'scissors', око: 'eye', орел: 'eagle',
+  риба: 'fish', серце: 'heart', сонце: 'sun', хмара: 'cloud', якір: 'anchor',
+  пляма1: 'spot1', пляма2: 'spot2', пляма3: 'spot3', пляма4: 'spot4', пляма5: 'spot5',
+};
+const slugKey = (key) => {
+  const m = key.normalize('NFC').match(/^coffee\/(.+)$/);
+  return m && COFFEE_SLUGS[m[1]] ? `coffee/${COFFEE_SLUGS[m[1]]}` : key;
+};
+
 for (const f of files) {
   const rel = f.replace(/^Arts\//, '');
-  const key = rel.replace(/\.[^.]+$/, '').toLowerCase();
+  const key = slugKey(rel.replace(/\.[^.]+$/, '').toLowerCase());
   const isCard = rel.startsWith('Tarot/') && !rel.includes('button');
   const out = `public/art/${key}.webp`;
   mkdirSync(dirname(out), { recursive: true });
@@ -101,6 +114,36 @@ for (const f of files) {
   const box = { left: x0, top: y0, width: x1 - x0 + 1, height: y1 - y0 + 1 };
   await sharp(f).extract(box).webp({ quality: 90, alphaQuality: 95 }).toFile(out);
   manifest.art[key] = { src: `/art/${key}.webp`, x: box.left, y: box.top, w: box.width, h: box.height };
+}
+
+// Кава в стаканчику окремим шаром (різниця між повним і порожнім стаканчиком), щоб «випити» її анімацією.
+{
+  const read = (f) => sharp(f).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const full = await read('Arts/Coffee/cup_with_coffee.PNG');
+  const empty = await read('Arts/Coffee/cup_empthy1.PNG');
+  const { width: w, height: h } = full.info;
+  const changed = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    const d = [0, 1, 2, 3].reduce((s, c) => s + Math.abs(full.data[i * 4 + c] - empty.data[i * 4 + c]), 0);
+    if (d > 40) changed[i] = 1;
+  }
+  const mask = dilate(changed, w, h, 3);
+  const rgba = Buffer.from(full.data);
+  let x0 = w, y0 = h, x1 = 0, y1 = 0;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      if (!mask[i]) { rgba[i * 4 + 3] = 0; continue; }
+      if (rgba[i * 4 + 3] > 8) {
+        if (x < x0) x0 = x; if (x > x1) x1 = x;
+        if (y < y0) y0 = y; if (y > y1) y1 = y;
+      }
+    }
+  }
+  const box = { left: x0, top: y0, width: x1 - x0 + 1, height: y1 - y0 + 1 };
+  const out = 'public/art/coffee/liquid.webp';
+  await sharp(rgba, { raw: { width: w, height: h, channels: 4 } }).extract(box).webp({ quality: 90, alphaQuality: 95 }).toFile(out);
+  manifest.art['coffee/liquid'] = { src: '/art/coffee/liquid.webp', x: box.left, y: box.top, w: box.width, h: box.height };
 }
 
 mkdirSync('src/art', { recursive: true });

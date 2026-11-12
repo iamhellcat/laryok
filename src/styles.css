@@ -599,3 +599,327 @@ button {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ---------- ворожіння на Маккохфе ---------- */
+
+.cf-frame {
+  min-height: min(165cqw, calc(100% - 12cqw));
+}
+.cf-frame .oracle-scroll {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.cf-body {
+  align-items: center;
+  /* по центру рамки, але без обрізання зверху, коли вміст довший за рамку */
+  margin-block: auto;
+}
+.cf-sticky {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+/* Під час тлумачення чашка зменшується й лишається вгорі, а текст прокручується під нею. */
+.cf-sticky.on {
+  position: sticky;
+  top: 0;
+  margin: -4.4cqw 0 4.4cqw;
+  padding: 4.4cqw 0 2cqw;
+  background: var(--paper);
+}
+.cf-wrap {
+  width: 74cqw;
+  transition: width 0.5s ease;
+}
+.cf-wrap.brew {
+  width: 62cqw;
+}
+.cf-sticky.on .cf-wrap {
+  width: 54cqw;
+}
+
+/* Одна сцена: спрайти розставлені відсотками, одиниці cqw рахуються від ширини самої сцени. */
+.cf {
+  position: relative;
+  width: 100%;
+  container-type: inline-size;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.cf img {
+  position: absolute;
+  display: block;
+  height: auto;
+  pointer-events: none;
+}
+.cf > svg,
+.cf > i,
+.cf-top,
+.cf-front,
+.cf-sachet {
+  position: absolute;
+}
+.cf-top {
+  inset: 0;
+}
+
+/* екран 1: пакетик надривається, нахиляється над стаканчиком і сиплеться кава */
+.cf-sachet {
+  animation: cf-pour 3.4s ease-in-out 2.1s both;
+}
+.cf-s1 { animation: cf-hide 0.01s linear 0.9s forwards; }
+.cf-s2 { opacity: 0; animation: cf-show 0.01s linear 0.9s forwards, cf-hide 0.01s linear 1.4s forwards; }
+.cf-s3 { opacity: 0; animation: cf-show 0.01s linear 1.4s forwards; }
+@keyframes cf-show { to { opacity: 1; } }
+@keyframes cf-hide { to { opacity: 0; } }
+
+.cf-strip {
+  opacity: 0;
+  transform-origin: 32% 16%;
+  animation: cf-strip 0.9s ease-in 1.4s forwards;
+}
+@keyframes cf-strip {
+  0% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translate(-16cqw, -24cqw) rotate(-42deg); }
+}
+
+@keyframes cf-pour {
+  0% { transform: none; opacity: 1; }
+  28% { transform: translate(var(--tx), var(--ty)) rotate(-131deg); }
+  40% { transform: translate(var(--tx), var(--ty)) rotate(-138deg); }
+  52% { transform: translate(var(--tx), var(--ty)) rotate(-126deg); }
+  64% { transform: translate(var(--tx), var(--ty)) rotate(-137deg); }
+  76% { transform: translate(var(--tx), var(--ty)) rotate(-129deg); }
+  88% { transform: translate(var(--tx), var(--ty)) rotate(-131deg); opacity: 1; }
+  100% { transform: translate(var(--tx), calc(var(--ty) - 25%)) rotate(-131deg); opacity: 0; }
+}
+
+.cf-grain {
+  position: absolute;
+  border-radius: 40%;
+  background: #5a3a28;
+  opacity: 0;
+  animation: cf-grain 0.7s ease-in both;
+}
+.cf-grain.t1 { background: #7a5036; }
+.cf-grain.t2 { background: #3f2a1e; }
+@keyframes cf-grain {
+  0% { opacity: 0; transform: translate(0, 0); }
+  12% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--gx), var(--gy)); }
+}
+
+/* екрани 2+: кава з парою, випивається, стакан крутиться й перевертається */
+.cf-front {
+  transform-origin: 50% 100%;
+}
+.cf-full,
+.cf-liquid {
+  opacity: 0;
+}
+.cf[data-phase='sip'] .cf-full {
+  opacity: 1;
+  animation: cf-fade 1.2s ease-in-out 2.5s forwards;
+}
+.cf[data-phase='sip'] .cf-liquid {
+  opacity: 1;
+  animation: cf-drain 1.5s ease-in 2.4s forwards;
+}
+.cf[data-phase='sip'] .cf-front {
+  animation: cf-sip 1.7s ease-in-out 2.2s;
+}
+@keyframes cf-fade { to { opacity: 0; } }
+@keyframes cf-drain { to { opacity: 0; transform: translateY(45%) scale(0.7, 0.2); } }
+@keyframes cf-sip {
+  0%, 100% { transform: none; }
+  40%, 60% { transform: rotate(-16deg) translateY(-2%); }
+}
+
+.cf-steam {
+  fill: none;
+  stroke: #6e5143;
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0;
+}
+.cf[data-phase='sip'] .cf-steam {
+  opacity: 1;
+  animation: cf-steam-out 0.6s ease-in 2.2s forwards;
+}
+.cf-steam path {
+  stroke-dasharray: 100;
+  animation: cf-wisp 2.4s ease-in-out infinite;
+}
+.cf-steam path:nth-child(2) { animation-delay: 0.5s; }
+.cf-steam path:nth-child(3) { animation-delay: 1s; }
+@keyframes cf-wisp {
+  0% { stroke-dashoffset: 100; opacity: 0; }
+  30% { opacity: 0.8; }
+  70% { stroke-dashoffset: 0; opacity: 0.8; }
+  100% { stroke-dashoffset: -100; opacity: 0; }
+}
+@keyframes cf-steam-out { to { opacity: 0; } }
+
+.cf[data-phase='spin'] .cf-front {
+  animation: cf-spin 1.3s ease-in-out;
+}
+@keyframes cf-spin {
+  0%, 100% { transform: none; }
+  50% { transform: translateY(-3%) perspective(900px) rotateY(180deg); }
+  99% { transform: perspective(900px) rotateY(360deg); }
+}
+
+.cf[data-phase='flip'] .cf-front {
+  animation: cf-flip-out 0.55s ease-in forwards;
+}
+@keyframes cf-flip-out {
+  to { opacity: 0; transform: rotate(200deg) scale(0.5) translateY(-20%); }
+}
+.cf[data-phase='bottom'] .cf-front,
+.cf[data-phase='spots'] .cf-front,
+.cf[data-phase='shake'] .cf-front,
+.cf[data-phase='read'] .cf-front,
+.cf[data-phase='bottom'] .cf-steam,
+.cf[data-phase='spots'] .cf-steam,
+.cf[data-phase='shake'] .cf-steam,
+.cf[data-phase='read'] .cf-steam {
+  display: none;
+}
+
+.cf-top {
+  opacity: 0;
+}
+.cf[data-phase='flip'] .cf-top {
+  animation: cf-flip-in 0.6s ease-out 0.4s forwards;
+}
+@keyframes cf-flip-in {
+  from { opacity: 0; transform: scale(0.55) rotate(-70deg); }
+  to { opacity: 1; transform: none; }
+}
+.cf[data-phase='bottom'] .cf-top,
+.cf[data-phase='spots'] .cf-top,
+.cf[data-phase='shake'] .cf-top,
+.cf[data-phase='read'] .cf-top {
+  opacity: 1;
+}
+
+.cf-grounds {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.cf[data-phase='spots'] .cf-grounds,
+.cf[data-phase='shake'] .cf-grounds,
+.cf[data-phase='read'] .cf-grounds {
+  opacity: 1;
+}
+
+/* спершу плями, після потрушування з них проступають символи */
+.cf-spot {
+  opacity: 0;
+  filter: blur(0.35cqw);
+}
+.cf[data-phase='spots'] .cf-spot {
+  opacity: 0.9;
+  animation: cf-spot-in 0.6s ease-out both;
+}
+.cf[data-phase='shake'] .cf-spot {
+  opacity: 0.9;
+  animation: cf-spot-out 0.7s ease-in 0.45s forwards;
+}
+@keyframes cf-spot-in { from { opacity: 0; transform: scale(0.6); } }
+@keyframes cf-spot-out { to { opacity: 0; transform: scale(1.3); filter: blur(1.4cqw); } }
+
+.cf-sym {
+  opacity: 0;
+  /* світле сяйво, щоб темні символи не губилися на коричневій гущі */
+  filter: blur(0) drop-shadow(0 0 1cqw rgb(255 238 208 / 0.85));
+}
+.cf[data-phase='shake'] .cf-sym {
+  animation: cf-sym-in 0.65s ease-out 0.55s forwards;
+}
+.cf[data-phase='read'] .cf-sym {
+  opacity: 1;
+}
+@keyframes cf-sym-in {
+  from { opacity: 0; filter: blur(1.2cqw) drop-shadow(0 0 0 transparent); transform: scale(0.7); }
+  to { opacity: 1; filter: blur(0) drop-shadow(0 0 1cqw rgb(255 238 208 / 0.85)); transform: none; }
+}
+
+.cf[data-phase='shake'] .cf-top {
+  animation: cf-shake 1.15s ease-in-out;
+}
+@keyframes cf-shake {
+  0%, 100% { transform: none; }
+  8% { transform: translate(-2cqw, 0.8cqw) rotate(-4deg); }
+  18% { transform: translate(2.2cqw, -0.6cqw) rotate(4deg); }
+  28% { transform: translate(-2.4cqw, 0.4cqw) rotate(-4.5deg); }
+  38% { transform: translate(2cqw, 0.8cqw) rotate(3.5deg); }
+  48% { transform: translate(-1.8cqw, -0.5cqw) rotate(-3deg); }
+  60% { transform: translate(1.4cqw, 0.4cqw) rotate(2.4deg); }
+  72% { transform: translate(-1cqw, 0) rotate(-1.6deg); }
+  86% { transform: translate(0.5cqw, 0) rotate(0.8deg); }
+}
+
+.cf-lit {
+  position: absolute;
+  display: block;
+  border: 1.8cqw solid var(--red);
+  border-radius: 48% 52% 50% 50% / 52% 48% 52% 48%;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: cf-lit 1.4s ease-in-out infinite;
+}
+@keyframes cf-lit { 50% { transform: scale(1.1); } }
+
+/* тексти й кнопки */
+.cf-text {
+  align-self: stretch;
+  margin: 3.4cqw 0 0;
+  font-size: 4.1cqw;
+  line-height: 1.42;
+  text-align: left;
+  text-wrap: pretty;
+  animation: pop-in 0.3s ease-out;
+}
+.cf-read {
+  align-self: stretch;
+  margin-top: 3cqw;
+  text-align: left;
+}
+.cf-part {
+  margin-bottom: 3cqw;
+  animation: pop-in 0.35s ease-out;
+}
+.cf-part p {
+  margin: 0;
+  font-size: 4.1cqw;
+  line-height: 1.42;
+  text-wrap: pretty;
+}
+.cf-part b {
+  font-family: var(--head);
+  font-weight: 800;
+  font-style: italic;
+  font-size: 5.4cqw;
+  color: var(--red);
+}
+.cf-part .cf-outro {
+  margin-top: 2.4cqw;
+  font-style: italic;
+}
+.cf-action {
+  animation: pop-in 0.3s ease-out;
+}
+.cf-link {
+  margin-top: 2.2cqw;
+  padding: 1cqw 2cqw;
+  border: 0;
+  background: none;
+  font-size: 3.6cqw;
+  text-decoration: underline;
+  text-underline-offset: 0.6cqw;
+}
