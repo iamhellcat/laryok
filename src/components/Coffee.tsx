@@ -25,7 +25,7 @@ type Phase = 'brew' | 'sip' | 'empty' | 'spin' | 'spun' | 'flip' | 'bottom' | 's
 /** Само збігається з тривалістю анімацій у styles.css. */
 const BREW_MS = 6800;
 const AUTO: Partial<Record<Phase, [number, Phase]>> = {
-  sip: [4400, 'empty'],
+  sip: [5400, 'empty'],
   spin: [1400, 'spun'],
   flip: [1000, 'bottom'],
   shake: [1250, 'read'],
@@ -121,6 +121,33 @@ const CUP_PAD = 24;
 /** Центр дна чашки в рамці. Нижній край чашки сидить на 4 px від низу. */
 const CUP_AT = { x: CUP_BOX.w / 2, y: CUP_BOX.h - CUP_PAD - (1605 - CUP.cy) };
 
+/**
+ * Клуб пари: вузький знизу й зверху, посередині ширший, тягнеться вгору хвилею. Ширина «пливе», тому форма
+ * виходить аморфною, а не лінією однієї товщини. Малюється суцільною заливкою, а не обводкою.
+ */
+function steamWisp(x: number, base: number, height: number, sway: number, width: number, phase: number) {
+  const steps = 32;
+  const left: string[] = [];
+  const right: string[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const cx = x + Math.sin(t * 6.6 + phase) * sway * (0.25 + t * 0.9);
+    const taper = Math.pow(Math.sin(Math.PI * Math.min(1, 0.06 + t * 0.9)), 0.75);
+    const w = Math.max(1.5, width * taper * (1 + 0.3 * Math.sin(t * 8.5 + phase * 1.7)) * (1 - 0.3 * t));
+    const y = base - t * height;
+    left.push(`${(cx - w / 2).toFixed(1)} ${y.toFixed(1)}`);
+    right.push(`${(cx + w / 2).toFixed(1)} ${y.toFixed(1)}`);
+  }
+  return `M${left.join(' L')} L${right.reverse().join(' L')} Z`;
+}
+
+const STEAM = [
+  { d: steamWisp(40, 124, 100, 12, 38, 0.4), delay: 0, dur: 3.4 },
+  { d: steamWisp(84, 126, 114, 14, 48, 2.1), delay: 0.5, dur: 3.8 },
+  { d: steamWisp(122, 124, 94, 11, 36, 4.2), delay: 1, dur: 3.2 },
+  { d: steamWisp(62, 120, 70, 9, 30, 5.4), delay: 1.5, dur: 3 },
+];
+
 interface CupStageProps {
   phase: Phase;
   reading: CoffeeReading | null;
@@ -172,13 +199,13 @@ function CupStage({ phase, reading, lit }: CupStageProps) {
 
       <svg
         className="cf-steam"
-        viewBox="0 0 160 120"
-        style={{ left: pct(CUP_BOX.w / 2 - 125, CUP_BOX.w), top: pct(0, CUP_BOX.h), width: pct(250, CUP_BOX.w) }}
+        viewBox="0 0 160 130"
+        style={{ left: pct(CUP_BOX.w / 2 - 125, CUP_BOX.w), top: pct(36, CUP_BOX.h), width: pct(250, CUP_BOX.w) }}
         aria-hidden="true"
       >
-        <path pathLength="100" d="M38 116 C18 92 58 80 38 56 S52 22 42 6" style={{ strokeWidth: 24 }} />
-        <path pathLength="100" d="M80 116 C60 90 100 76 80 52 S94 18 84 2" style={{ strokeWidth: 30 }} />
-        <path pathLength="100" d="M122 116 C102 92 142 80 122 58 S136 26 126 10" style={{ strokeWidth: 22 }} />
+        {STEAM.map((w) => (
+          <path key={w.d} d={w.d} style={{ animationDelay: `${w.delay}s`, animationDuration: `${w.dur}s` }} />
+        ))}
       </svg>
 
       <div

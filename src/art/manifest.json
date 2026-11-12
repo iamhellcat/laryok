@@ -77,9 +77,9 @@
   "coffee/coffe_stick3": {
    "src": "/art/coffee/coffe_stick3.webp",
    "x": 597,
-   "y": 692,
+   "y": 697,
    "w": 448,
-   "h": 464
+   "h": 459
   },
   "coffee/coffee_button": {
    "src": "/art/coffee/coffee_button.webp",
