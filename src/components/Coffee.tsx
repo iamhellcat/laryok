@@ -7,8 +7,12 @@ import { CUP, drawCoffee, saveCoffee, symbolScale, todaysCoffee, type CoffeeRead
 /** Як відкрито ворожіння: нове за обраною темою або перечитування сьогоднішнього. */
 export type CoffeeRun = { mode: 'new'; topic: CoffeeTopic } | { mode: 'again' };
 
-const BREW_TEXT =
-  'Ви відкриваєте пакетик, засипаєте його в паперовий стаканчик, заливаєте кип’ятком і запах, знайомий з навчання, вдаряє вам у носа. Нота ностальгії, присмак першого кохання, фантом долара по 8 та гіркий післясмак невідворотно швидкоплинної молодості. Ви не можете позбутися почуття, що каву маєте заварювати не ви, а продавець, але вам сказали, що так треба для встановлення контакту з космосом.';
+/** Екран 1: речення з'являються по черзі в такт анімації (затримка в секундах). */
+const BREW_LINES: [string, number][] = [
+  ['Ви відкриваєте пакетик, засипаєте його в паперовий стаканчик, заливаєте кип’ятком і запах, знайомий з навчання, вдаряє вам у носа.', 0.4],
+  ['Нота ностальгії, присмак першого кохання, фантом долара по 8 та гіркий післясмак невідворотно швидкоплинної молодості.', 2.8],
+  ['Ви не можете позбутися почуття, що каву маєте заварювати не ви, а продавець, але вам сказали, що так треба для встановлення контакту з космосом.', 5],
+];
 const SIP_TEXT =
   'Важко сказати, чи вам смакує розчинна кава, чи спогади про кращі часи. І хоча вміст пакетику не мав би залишити сліди, щойно ви допили свій напій, на стінках стаканчика дійсно проступають певні символи.';
 // Цього тексту в документі нема, його написав Claude.
@@ -19,7 +23,7 @@ const TIME_LINES = ['Це події, що минули.', 'Це події, щ�
 type Phase = 'brew' | 'sip' | 'empty' | 'spin' | 'spun' | 'flip' | 'bottom' | 'spots' | 'shake' | 'read';
 
 /** Само збігається з тривалістю анімацій у styles.css. */
-const BREW_MS = 5600;
+const BREW_MS = 6800;
 const AUTO: Partial<Record<Phase, [number, Phase]>> = {
   sip: [4400, 'empty'],
   spin: [1400, 'spun'],
@@ -48,9 +52,6 @@ const SACHET = { x: 570, y: 656, w: 474, h: 499 };
 const EDGE = { x: 735, y: 780 };
 /** Куди цю точку перенести, щоб пакетик завис над стаканчиком. */
 const POUR_AT = { x: 570, y: 1110 };
-
-/** Смужка, що відривається, у частках кадрів stick2 (малюється як вирізка з нього). */
-const STRIP_CLIP = 'polygon(0% 26.8%, 63.2% 0%, 66.3% 8.8%, 60.2% 10%, 5.3% 37.8%)';
 
 /** Крупинки розчинної кави: рівномірно по краю пакетика й униз у стаканчик. */
 const GRAINS = Array.from({ length: 40 }, (_, i) => {
@@ -88,10 +89,10 @@ function BrewStage() {
     <div className="cf brew" style={{ aspectRatio: `${BREW_BOX.w} / ${BREW_BOX.h}` }}>
       <Sprite name="coffee/cup_empthy1" style={place(cup, BREW_BOX)} />
       <div className="cf-sachet" style={wrapper}>
+        {/* Нижній шар без смужки, поверх нього кадр зі смужкою розчиняється. */}
+        <Sprite name="coffee/coffe_stick3" className="cf-s3" style={place(s3, SACHET)} />
         <Sprite name="coffee/coffe_stick1" className="cf-s1" style={place(s1, SACHET)} />
         <Sprite name="coffee/coffe_stick2" className="cf-s2" style={place(s2, SACHET)} />
-        <Sprite name="coffee/coffe_stick3" className="cf-s3" style={place(s3, SACHET)} />
-        <Sprite name="coffee/coffe_stick2" className="cf-strip" style={{ ...place(s2, SACHET), clipPath: STRIP_CLIP }} />
       </div>
       {GRAINS.map((g, i) => (
         <i
@@ -114,9 +115,11 @@ function BrewStage() {
 
 // ---------- екрани 2+: стаканчик ----------
 
-const CUP_BOX = { w: 660, h: 620 };
+const CUP_BOX = { w: 660, h: 640 };
+/** Запас знизу, щоб чашка, що трясеться, не виходила за рамку. */
+const CUP_PAD = 24;
 /** Центр дна чашки в рамці. Нижній край чашки сидить на 4 px від низу. */
-const CUP_AT = { x: CUP_BOX.w / 2, y: CUP_BOX.h - 4 - (1605 - CUP.cy) };
+const CUP_AT = { x: CUP_BOX.w / 2, y: CUP_BOX.h - CUP_PAD - (1605 - CUP.cy) };
 
 interface CupStageProps {
   phase: Phase;
@@ -129,7 +132,7 @@ function CupStage({ phase, reading, lit }: CupStageProps) {
   const liquid = art('coffee/liquid');
   const frontStyle: CSSProperties = {
     left: pct(CUP_BOX.w / 2 - front.w / 2, CUP_BOX.w),
-    top: pct(CUP_BOX.h - 4 - front.h, CUP_BOX.h),
+    top: pct(CUP_BOX.h - CUP_PAD - front.h, CUP_BOX.h),
     width: pct(front.w, CUP_BOX.w),
     height: pct(front.h, CUP_BOX.h),
   };
@@ -167,10 +170,15 @@ function CupStage({ phase, reading, lit }: CupStageProps) {
         />
       </div>
 
-      <svg className="cf-steam" viewBox="0 0 120 120" style={{ left: pct(CUP_BOX.w / 2 - 70, CUP_BOX.w), top: pct(14, CUP_BOX.h), width: pct(140, CUP_BOX.w) }} aria-hidden="true">
-        <path pathLength="100" d="M30 118 C14 94 46 80 30 54 S42 18 34 4" />
-        <path pathLength="100" d="M60 118 C44 92 76 76 60 50 S72 14 64 0" />
-        <path pathLength="100" d="M90 118 C74 94 106 80 90 56 S102 22 94 8" />
+      <svg
+        className="cf-steam"
+        viewBox="0 0 160 120"
+        style={{ left: pct(CUP_BOX.w / 2 - 125, CUP_BOX.w), top: pct(0, CUP_BOX.h), width: pct(250, CUP_BOX.w) }}
+        aria-hidden="true"
+      >
+        <path pathLength="100" d="M38 116 C18 92 58 80 38 56 S52 22 42 6" style={{ strokeWidth: 24 }} />
+        <path pathLength="100" d="M80 116 C60 90 100 76 80 52 S94 18 84 2" style={{ strokeWidth: 30 }} />
+        <path pathLength="100" d="M122 116 C102 92 142 80 122 58 S136 26 126 10" style={{ strokeWidth: 22 }} />
       </svg>
 
       <div
@@ -295,7 +303,9 @@ export function CoffeeRitual({ character, run, onReveal, onClose }: Props) {
     setPhase('shake');
   };
 
-  const text = phase === 'brew' ? BREW_TEXT : phase === 'spots' || phase === 'shake' ? SPOTS_TEXT : phase !== 'read' ? SIP_TEXT : '';
+  // Після «Покрутіть» тексту нема, але місце під ним лишається, щоб чашка й кнопки не стрибали.
+  const textHidden = phase === 'spin' || phase === 'spun' || phase === 'flip' || phase === 'bottom';
+  const text = phase === 'spots' || phase === 'shake' ? SPOTS_TEXT : phase !== 'read' && phase !== 'brew' ? SIP_TEXT : '';
 
   const action: [string, () => void] | null =
     phase === 'brew' ? (ready ? ['Далі', () => setPhase('sip')] : null)
@@ -323,7 +333,14 @@ export function CoffeeRitual({ character, run, onReveal, onClose }: Props) {
               </div>
             </div>
 
-            {text && <p className="cf-text" key={text}>{text}</p>}
+            {phase === 'brew' && (
+              <p className="cf-text">
+                {BREW_LINES.map(([line, delay]) => (
+                  <span className="cf-line" key={line} style={{ animationDelay: `${delay}s` }}>{line} </span>
+                ))}
+              </p>
+            )}
+            {text && <p className={textHidden ? 'cf-text fixed gone' : 'cf-text fixed'} key={text}>{text}</p>}
 
             {phase === 'read' && (
               <div className="cf-read">
@@ -339,9 +356,13 @@ export function CoffeeRitual({ character, run, onReveal, onClose }: Props) {
               </div>
             )}
 
-            {action && (
-              <button className="reply done cf-action" key={phase} onClick={action[1]}>{action[0]}</button>
-            )}
+            {phase !== 'read' &&
+              (action ? (
+                <button className="reply done cf-action" key={phase} onClick={action[1]}>{action[0]}</button>
+              ) : (
+                // Невидима кнопка тримає місце, щоб чашка не стрибала, коли справжня з'являється чи зникає.
+                <button className="reply done cf-action ghost" tabIndex={-1} aria-hidden="true" disabled>Дізнатися тлумачення</button>
+              ))}
 
             {phase === 'read' && step < 3 && (
               <>

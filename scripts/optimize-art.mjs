@@ -77,6 +77,25 @@ const COFFEE_SLUGS = {
   риба: 'fish', серце: 'heart', сонце: 'sun', хмара: 'cloud', якір: 'anchor',
   пляма1: 'spot1', пляма2: 'spot2', пляма3: 'spot3', пляма4: 'spot4', пляма5: 'spot5',
 };
+// Символи на чашці отримують світле сяйво прямо в картинці, щоб темні знаки не губилися на коричневій гущі.
+const COFFEE_SYMBOL_KEYS = new Set(Object.values(COFFEE_SLUGS).filter((v) => !v.startsWith('spot')).map((v) => `coffee/${v}`));
+const HALO = 16;
+
+async function withHalo(file, box) {
+  const tight = await sharp(file).extract(box).png().toBuffer();
+  const padded = await sharp(tight)
+    .extend({ top: HALO, bottom: HALO, left: HALO, right: HALO, background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png()
+    .toBuffer();
+  const meta = await sharp(padded).metadata();
+  const glowAlpha = await sharp(padded).extractChannel(3).blur(4.5).linear(2.2, 0).raw().toBuffer();
+  const glow = await sharp({ create: { width: meta.width, height: meta.height, channels: 3, background: { r: 255, g: 238, b: 208 } } })
+    .joinChannel(glowAlpha, { raw: { width: meta.width, height: meta.height, channels: 1 } })
+    .png()
+    .toBuffer();
+  return sharp(glow).composite([{ input: padded }]);
+}
+
 const slugKey = (key) => {
   const m = key.normalize('NFC').match(/^coffee\/(.+)$/);
   return m && COFFEE_SLUGS[m[1]] ? `coffee/${COFFEE_SLUGS[m[1]]}` : key;
@@ -112,6 +131,12 @@ for (const f of files) {
     }
   }
   const box = { left: x0, top: y0, width: x1 - x0 + 1, height: y1 - y0 + 1 };
+  if (COFFEE_SYMBOL_KEYS.has(key)) {
+    const image = await withHalo(f, box);
+    const info = await image.webp({ quality: 90, alphaQuality: 95 }).toFile(out);
+    manifest.art[key] = { src: `/art/${key}.webp`, x: box.left - HALO, y: box.top - HALO, w: info.width, h: info.height };
+    continue;
+  }
   await sharp(f).extract(box).webp({ quality: 90, alphaQuality: 95 }).toFile(out);
   manifest.art[key] = { src: `/art/${key}.webp`, x: box.left, y: box.top, w: box.width, h: box.height };
 }
