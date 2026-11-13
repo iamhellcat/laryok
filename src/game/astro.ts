@@ -13,9 +13,9 @@ const MOVERS = [Body.Mercury, Body.Venus, Body.Mars, Body.Jupiter, Body.Saturn, 
 
 /** Моменти фаз за кутом Місяць–Сонце. */
 const PHASE_MOMENTS: [number, string][] = [
-  [0, 'Новий місяць'],
+  [0, 'Новий Місяць'],
   [90, 'Перша чверть'],
-  [180, 'Повний місяць'],
+  [180, 'Повний Місяць'],
   [270, 'Остання чверть'],
 ];
 
@@ -88,14 +88,14 @@ function longitude(body: Body, t: Date): number {
 
 function phaseName(angle: number): string {
   const near = (target: number) => Math.abs(norm180(angle - target)) <= 10;
-  if (near(0)) return 'Новий місяць';
+  if (near(0)) return 'Новий Місяць';
   if (near(90)) return 'Перша чверть';
-  if (near(180)) return 'Повний місяць';
+  if (near(180)) return 'Повний Місяць';
   if (near(270)) return 'Остання чверть';
-  if (angle < 90) return 'Молодий місяць';
-  if (angle < 180) return 'Зростаючий місяць';
-  if (angle < 270) return 'Спадаючий місяць';
-  return 'Старий місяць';
+  if (angle < 90) return 'Молодий Місяць';
+  if (angle < 180) return 'Зростаючий Місяць';
+  if (angle < 270) return 'Спадаючий Місяць';
+  return 'Старий Місяць';
 }
 
 /** Час останнього новолуння до моменту `t`. */
