@@ -552,6 +552,16 @@ button {
   font-size: 3.7cqw;
   line-height: 1.4;
 }
+/* «Детальніше» під ретроградами: дрібніша кнопка зліва, а не велика по центру */
+.paper .more {
+  width: auto;
+  margin: 1.4cqw 0 2.2cqw;
+  padding: 1.6cqw 4.4cqw;
+  font-size: 3.4cqw;
+}
+.retro-detail {
+  animation: pop-in 0.25s ease-out;
+}
 .note {
   margin: 0.6cqw 0 1.6cqw;
   font-size: 3.2cqw;

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { computeAstro, type MoonPhaseInfo } from '../game/astro';
 
 /** Ділить текст на заголовок (перше речення без крапки) і решту. */
@@ -32,6 +32,7 @@ function MoonIcon({ phase }: { phase: MoonPhaseInfo }) {
 /** Газета «Сьогодні»: місячна доба, Місяць у знаку й аспекти дня. */
 export function Astro({ onClose }: { onClose: () => void }) {
   const r = useMemo(() => computeAstro(), []);
+  const [moreRetro, setMoreRetro] = useState(false);
   const percent = Math.round(r.phase.illumination * 100);
   const moonSign = splitHead(r.moonSign);
   const sunSign = splitHead(r.sunSign);
@@ -80,23 +81,47 @@ export function Astro({ onClose }: { onClose: () => void }) {
             )}
           </section>
 
-          {(r.retrograde.length > 0 || r.stations.length > 0) && (
+          {(r.retrograde.length > 0 || r.exiting.length > 0 || r.entering.length > 0) && (
             <section>
               <h3>Ретрогради</h3>
-              {r.stations.map((st) => (
-                <p className="note" key={st.text}>О {clock(st.time)} {st.text}</p>
+              {r.retrograde.length > 0 && (
+                <p className="paper-text">
+                  Зараз у ретрограді перебувають: <b>{r.retrograde.map((p) => p.name).join(', ')}</b>.
+                </p>
+              )}
+              {/* Вихід із ретроградності описуємо лише тоді, коли планета виходить саме сьогодні. */}
+              {r.exiting.length > 0 && (
+                <>
+                  <p className="paper-text">
+                    З ретрограду виходить: <b>{r.exiting.map((p) => `${p.name} (о ${clock(p.time)})`).join(', ')}</b>.
+                  </p>
+                  {r.exiting.map((p) => (
+                    <p className="paper-text" key={p.name}>{p.text}</p>
+                  ))}
+                </>
+              )}
+              {r.entering.map((p) => (
+                <p className="note" key={p.name}>О {clock(p.time)} {p.name} входить у ретроградність.</p>
               ))}
-              {r.retrograde.map(({ text, exit }) => {
-                const { head, body } = splitHead(text);
-                return (
-                  <div key={head}>
-                    <p className="paper-text">
-                      <b>{head}.</b> {body}
-                    </p>
-                    {exit && <p className="note">Вийде з ретроградності {when(exit, r.today)}.</p>}
-                  </div>
-                );
-              })}
+              {r.retrograde.length > 0 && (
+                <>
+                  <button className="reply more" aria-expanded={moreRetro} onClick={() => setMoreRetro(!moreRetro)}>
+                    {moreRetro ? 'Сховати' : 'Детальніше'}
+                  </button>
+                  {moreRetro &&
+                    r.retrograde.map(({ name, text, exit }) => {
+                      const { head, body } = splitHead(text);
+                      return (
+                        <div className="retro-detail" key={name}>
+                          <p className="paper-text">
+                            <b>{head}.</b> {body}
+                          </p>
+                          {exit && <p className="note">Вийде з ретроградності {when(exit, r.today)}.</p>}
+                        </div>
+                      );
+                    })}
+                </>
+              )}
             </section>
           )}
 

@@ -1,6 +1,6 @@
 import { Body, EclipticGeoMoon, Ecliptic, GeoVector, MoonPhase, Observer, SearchMoonPhase, SearchRiseSet, SunPosition } from 'astronomy-engine';
 import {
-  LUNAR_DAYS, MOON_IN_SIGN, MOON_SIGN_THESIS, PHASE_THESIS, PLANET_NAMES, RETROGRADE_TEXT, SIGN_NAMES, SUN_IN_SIGN, SUN_SIGN_THESIS,
+  LUNAR_DAYS, MOON_IN_SIGN, MOON_SIGN_THESIS, PHASE_THESIS, PLANET_NAMES, RETROGRADE, SIGN_NAMES, SUN_IN_SIGN, SUN_SIGN_THESIS,
 } from '../data/astro';
 
 // Місячну добу рахуємо за сходом Місяця в Києві.
@@ -33,18 +33,24 @@ export interface Ingress {
   sign: string;
 }
 
-export interface Station {
-  time: Date;
-  text: string;
-  body: Body;
-  /** true — планета повертається до прямого руху, false — стає ретроградною. */
-  direct: boolean;
-}
-
 export interface RetrogradePlanet {
+  /** «Меркурій». */
+  name: string;
+  /** Опис ретроградності: перше речення — заголовок. */
   text: string;
   /** Коли планета вийде з ретроградності (повернеться до прямого руху). */
   exit: Date | null;
+}
+
+/** Планета, що протягом доби змінює напрямок руху. */
+export interface Station {
+  name: string;
+  time: Date;
+}
+
+export interface ExitingPlanet extends Station {
+  /** Що означає вихід цієї планети з ретроградності (текст з документа). */
+  text: string;
 }
 
 export interface AstroReport {
@@ -63,8 +69,10 @@ export interface AstroReport {
   sunIngress: Ingress | null;
   /** Планети, які зараз ретроградні, з описами й датою виходу. */
   retrograde: RetrogradePlanet[];
-  /** Планети, що протягом доби змінюють напрямок руху. */
-  stations: Station[];
+  /** Планети, що саме сьогодні виходять із ретроградності. */
+  exiting: ExitingPlanet[];
+  /** Планети, що саме сьогодні входять у ретроградність. */
+  entering: Station[];
   /** Підсумок дня: три короткі тези (фаза Місяця, Сонце в знаку, Місяць у знаку). */
   theses: { label: string; text: string }[];
 }
@@ -196,9 +204,11 @@ export function computeAstro(now: Date = new Date()): AstroReport {
   };
 
   const retroBodies = MOVERS.filter((b) => velocity(b, now) < 0);
-  const retrograde: RetrogradePlanet[] = retroBodies.map((b) => ({ text: RETROGRADE_TEXT[b], exit: nextDirect(b) }));
+  const retrograde: RetrogradePlanet[] = retroBodies.map((b) => ({ name: PLANET_NAMES[b], text: RETROGRADE[b].text, exit: nextDirect(b) }));
 
-  const stations: Station[] = [];
+  // Зміна напрямку руху протягом доби: хто виходить із ретроградності, а хто входить у неї.
+  const exiting: ExitingPlanet[] = [];
+  const entering: Station[] = [];
   for (const body of MOVERS) {
     const v = samples.map((s) => velocity(body, s.t));
     for (let k = 0; k < 24; k++) {
@@ -210,18 +220,13 @@ export function computeAstro(now: Date = new Date()): AstroReport {
         if (Math.sign(velocity(body, new Date(mid))) === Math.sign(v[k])) lo = mid;
         else hi = mid;
       }
-      const direct = v[k + 1] >= 0;
-      // Вихід із ретроградності планети, яка ще ретроградна, вже написаний у її описі.
-      if (direct && retroBodies.includes(body)) continue;
-      stations.push({
-        time: new Date(hi),
-        text: `${PLANET_NAMES[body]} ${direct ? 'повертається до прямого руху' : 'стає ретроградним'}.`,
-        body,
-        direct,
-      });
+      const time = new Date(hi);
+      if (v[k + 1] >= 0) exiting.push({ name: PLANET_NAMES[body], time, text: RETROGRADE[body].exit });
+      else entering.push({ name: PLANET_NAMES[body], time });
     }
   }
-  stations.sort((a, b) => a.time.getTime() - b.time.getTime());
+  exiting.sort((a, b) => a.time.getTime() - b.time.getTime());
+  entering.sort((a, b) => a.time.getTime() - b.time.getTime());
 
   const sunIndex = signIndex(longitude(Body.Sun, now));
   const moonIndex = signIndex(longitude(Body.Moon, now));
@@ -239,7 +244,8 @@ export function computeAstro(now: Date = new Date()): AstroReport {
     sunSign: SUN_IN_SIGN[sunIndex],
     sunIngress: ingress(0),
     retrograde,
-    stations,
+    exiting,
+    entering,
     theses: [
       { label: phase.name, text: PHASE_THESIS[phase.name] },
       { label: headOf(SUN_IN_SIGN[sunIndex]), text: SUN_SIGN_THESIS[sunIndex] },
