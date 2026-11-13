@@ -12,6 +12,7 @@ import { characterForToday } from './data/characters';
 import { COFFEE_TOPICS, type CoffeeTopic } from './data/coffee';
 import type { Mood, Reply, SystemId } from './data/types';
 import { todaysCoffee } from './game/coffee';
+import { markPaperBought, paperBoughtToday } from './game/paper';
 import { loadWallet, saveBalance } from './game/wallet';
 
 // Читаємо гаманець один раз при запуску, щоб щоденні монети нарахувалися рівно раз.
@@ -24,7 +25,8 @@ type Ui =
   // path — репліка, якою розмова дійшла до вибору пророцтв; від неї залежить тон фрази «що ще?» після ворожіння.
   // then — настрій, на який персонаж перемикається посеред репліки (див. DialogNode.thenMood).
   | { kind: 'dialog'; say: string; mood: Mood; then?: Mood; menu: boolean; replies: Reply[]; path: string }
-  | { kind: 'oracle'; system: SystemId; path: string; coffee?: CoffeeRun };
+  // free — газету вже куплено сьогодні, її перечитують без монети.
+  | { kind: 'oracle'; system: SystemId; path: string; coffee?: CoffeeRun; free?: boolean };
 
 const PRODUCTS = [
   'tarot/tarot_button',
@@ -141,12 +143,17 @@ export default function App() {
       chooseCoffee();
       return;
     }
-    if (balance < 1) {
+    // Газета коштує монету лише раз на добу: куплену можна читати знову скільки завгодно.
+    const owned = system === 'astro' && paperBoughtToday();
+    if (balance < 1 && !owned) {
       sayNode('broke');
       return;
     }
-    if (system === 'astro') spend();
-    setUi({ kind: 'oracle', system, path: ui.kind === 'dialog' ? ui.path : character.start });
+    if (system === 'astro' && !owned) {
+      spend();
+      markPaperBought();
+    }
+    setUi({ kind: 'oracle', system, path: ui.kind === 'dialog' ? ui.path : character.start, free: owned });
   };
 
   // Після ворожіння персонаж не мовчить, а питає «що ще?» тим самим тоном; без монет — каже, що їх нема.
@@ -233,7 +240,7 @@ export default function App() {
             character={character}
             coffee={ui.coffee}
             onReveal={spend}
-            onClose={() => afterOracle(ui.path, ui.coffee?.mode === 'again')}
+            onClose={() => afterOracle(ui.path, ui.coffee?.mode === 'again' || ui.free)}
           />
         )}
 
