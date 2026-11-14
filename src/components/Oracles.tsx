@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from 'react';
 import { art } from '../art';
 import { HEXAGRAMS, type Hexagram } from '../data/iching';
-import { MO_READINGS, MO_SYLLABLES } from '../data/mo';
 import { splitReading, TAROT_CARDS, tarotArtKey, type TarotCard } from '../data/tarot';
 import type { Character, SystemId } from '../data/types';
 import { Astro } from './Astro';
 import { BallRitual } from './Ball';
 import { CoffeeRitual, type CoffeeRun } from './Coffee';
+import { MoRitual } from './Mo';
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
@@ -125,35 +125,13 @@ function IChing({ onReveal, onClose }: OracleProps) {
   );
 }
 
-function Mo({ onReveal, onClose }: OracleProps) {
-  return (
-    <RevealOracle<[number, number]>
-      label="Тибетське ворожіння МО"
-      roll={() => [Math.floor(Math.random() * 6), Math.floor(Math.random() * 6)]}
-      onReveal={onReveal}
-      onClose={onClose}
-      back={<Img name="mo/mo_back" className="dice-back" />}
-      result={([a, b]) => (
-        <>
-          <div className="dice">
-            <Img name={`mo/${MO_SYLLABLES[a].id}`} className="die" />
-            <Img name={`mo/${MO_SYLLABLES[b].id}`} className="die" />
-          </div>
-          <h2 className="result-title">{MO_SYLLABLES[a].label} · {MO_SYLLABLES[b].label}</h2>
-          <p className="result-text">{MO_READINGS[a][b]}</p>
-        </>
-      )}
-    />
-  );
-}
-
 export function Oracle({ system, ...props }: OracleProps & { system: SystemId }) {
   switch (system) {
     case 'tarot': return <Tarot {...props} />;
     case 'ball': return <BallRitual onReveal={props.onReveal} onClose={props.onClose} />;
     case 'coffee': return <CoffeeRitual character={props.character} run={props.coffee ?? { mode: 'new', topic: 'events' }} onReveal={props.onReveal} onClose={props.onClose} />;
     case 'iching': return <IChing {...props} />;
-    case 'mo': return <Mo {...props} />;
+    case 'mo': return <MoRitual onReveal={props.onReveal} onClose={props.onClose} />;
     case 'astro': return <Astro onClose={props.onClose} />;
     default: return null;
   }

@@ -171,6 +171,25 @@ for (const f of files) {
   manifest.art['coffee/liquid'] = { src: '/art/coffee/liquid.webp', x: box.left, y: box.top, w: box.width, h: box.height };
 }
 
+// Порожній кубик МО: ліва половина MO_back (там два однакові кубики поруч). Потрібен окремо, щоб кубики можна було підкидати.
+{
+  const { data, info } = await sharp('Arts/MO/MO_back.PNG').ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const W = info.width;
+  const hasInk = (x) => {
+    for (let y = 0; y < info.height; y++) if (data[(y * W + x) * 4 + 3] > 8) return true;
+    return false;
+  };
+  let x0 = 0;
+  while (x0 < W && !hasInk(x0)) x0++;
+  let x1 = x0;
+  while (x1 < W && hasInk(x1)) x1++;
+  let y0 = info.height, y1 = 0;
+  for (let y = 0; y < info.height; y++) for (let x = x0; x < x1; x++) if (data[(y * W + x) * 4 + 3] > 8) { y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  const box = { left: x0, top: y0, width: x1 - x0, height: y1 - y0 + 1 };
+  await sharp('Arts/MO/MO_back.PNG').extract(box).webp({ quality: 90, alphaQuality: 95 }).toFile('public/art/mo/blank.webp');
+  manifest.art['mo/blank'] = { src: '/art/mo/blank.webp', x: box.left, y: box.top, w: box.width, h: box.height };
+}
+
 mkdirSync('src/art', { recursive: true });
 writeFileSync('src/art/manifest.json', JSON.stringify(manifest, null, 1));
 
