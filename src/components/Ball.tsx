@@ -1,6 +1,7 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { art } from '../art';
 import { MAGIC_BALL_ANSWERS } from '../data/oracles';
+import { fitAnswer, TRIANGLE_CENTER_X } from '../game/fitAnswer';
 import { place } from './place';
 import { Sprite } from './Sprite';
 
@@ -9,8 +10,18 @@ const ASK_TEXT = 'Загадайте одне просте питання, на 
 /** Рамка сцени: кулька з запасом по 40 px, щоб вона могла трястися, не виходячи за межі. */
 const BOX = { x: 257, y: 783, w: 800, h: 766 };
 
-/** Місце для відповіді на синьому трикутнику (dice_still), у пікселях полотна. Трикутник вужчий донизу. */
-const ANSWER = { x: 544, y: 1066, w: 222, h: 76 };
+/** Шрифт відповіді: ширину рядків міряємо ним же. */
+const ANSWER_FONT = "700 100px 'Sofia Sans Extra Condensed', 'Arial Narrow', sans-serif";
+
+/** Ширина рядка шрифтом розміру 1. */
+const measureText = (() => {
+  const ctx = document.createElement('canvas').getContext('2d');
+  return (s: string) => {
+    if (!ctx) return s.length * 0.4;
+    ctx.font = ANSWER_FONT;
+    return ctx.measureText(s).width / 100;
+  };
+})();
 
 type Phase = 'ask' | 'shake' | 'roll' | 'done';
 
@@ -21,9 +32,6 @@ const AUTO: Partial<Record<Phase, [number, Phase]>> = {
 };
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
-
-/** Короткі відповіді крупніше, довгі переносяться на два рядки й стають дрібнішими. */
-const answerSize = (answer: string) => (answer.length <= 7 ? '9cqw' : answer.length <= 13 ? '5.4cqw' : '4.4cqw');
 
 interface Props {
   /** Викликається, коли кулю потрусили: тоді списується монета. */
@@ -51,12 +59,13 @@ export function BallRitual({ onReveal, onClose }: Props) {
 
   const back = art('magic_ball/ball_back');
   const front = art('magic_ball/ball_front');
-  const answerBox: CSSProperties = {
-    left: `${((ANSWER.x - BOX.x) / BOX.w) * 100}%`,
-    top: `${((ANSWER.y - BOX.y) / BOX.h) * 100}%`,
-    width: `${(ANSWER.w / BOX.w) * 100}%`,
-    height: `${(ANSWER.h / BOX.h) * 100}%`,
-    fontSize: answerSize(answer),
+  // Довга відповідь розбивається на рядки, щоб шрифт був якнайбільший і вміщався у трикутник.
+  const layout = useMemo(() => (answer ? fitAnswer(answer, measureText) : null), [answer]);
+  const answerStyle = layout && {
+    left: `${((TRIANGLE_CENTER_X - 160 - BOX.x) / BOX.w) * 100}%`,
+    width: `${(320 / BOX.w) * 100}%`,
+    top: `${((layout.top - BOX.y) / BOX.h) * 100}%`,
+    fontSize: `${(layout.size / BOX.w) * 100}cqw`,
   };
 
   return (
@@ -73,7 +82,9 @@ export function BallRitual({ onReveal, onClose }: Props) {
                   <Sprite name="magic_ball/ball_front" className="bl-front" style={place(front, BOX)} />
                   <Sprite name="magic_ball/dice_roll" className="bl-roll" style={place(art('magic_ball/dice_roll'), BOX)} />
                   <Sprite name="magic_ball/dice_still" className="bl-still" style={place(art('magic_ball/dice_still'), BOX)} />
-                  <span className="bl-answer" style={answerBox}>{answer}</span>
+                  <span className="bl-answer" style={answerStyle ?? undefined}>
+                    {layout?.lines.map((line) => <span className="bl-line" key={line}>{line}</span>)}
+                  </span>
                 </div>
               </div>
             </div>

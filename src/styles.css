@@ -1005,14 +1005,15 @@ button {
 
 .bl-answer {
   position: absolute;
-  display: grid;
-  place-items: center;
   font-family: var(--head);
   font-weight: 700;
   line-height: 1;
   text-align: center;
-  text-wrap: balance;
   color: #e6f3ff;
+}
+.bl-line {
+  display: block;
+  white-space: nowrap;
 }
 .bl[data-phase='roll'] .bl-answer {
   animation: bl-in 0.5s ease-out 1.4s forwards;
