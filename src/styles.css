@@ -1082,16 +1082,20 @@ button {
   transform-origin: 50% 50%;
 }
 
-/* три монетки підлітають, обертаються в повітрі навколо горизонтальної осі й падають */
+/* три монетки підлітають, обертаються в повітрі навколо горизонтальної осі, розлітаються й падають */
 .io[data-phase='toss'] .c0 {
-  animation: io-toss-0 1.35s cubic-bezier(0.3, 0.7, 0.4, 1) both, io-fade 0.25s ease-in 1.25s forwards;
+  animation: io-toss-0 1.35s cubic-bezier(0.3, 0.7, 0.4, 1) both, io-spread-0 1.2s ease-out 0.5s both, io-fade 0.3s ease-in 1.4s forwards;
 }
 .io[data-phase='toss'] .c1 {
-  animation: io-toss-1 1.35s cubic-bezier(0.3, 0.7, 0.4, 1) 0.1s both, io-fade 0.25s ease-in 1.25s forwards;
+  animation: io-toss-1 1.35s cubic-bezier(0.3, 0.7, 0.4, 1) 0.1s both, io-spread-1 1.2s ease-out 0.5s both, io-fade 0.3s ease-in 1.4s forwards;
 }
 .io[data-phase='toss'] .c2 {
-  animation: io-toss-2 1.35s cubic-bezier(0.3, 0.7, 0.4, 1) 0.05s both, io-fade 0.25s ease-in 1.25s forwards;
+  animation: io-toss-2 1.35s cubic-bezier(0.3, 0.7, 0.4, 1) 0.05s both, io-spread-2 1.2s ease-out 0.5s both, io-fade 0.3s ease-in 1.4s forwards;
 }
+/* Монетки розлітаються в боки: падають не там, де лежали, а трохи далі одна від одної, і так зникають. Окрема властивість translate складається з transform. */
+@keyframes io-spread-0 { to { translate: -8% -9%; } }
+@keyframes io-spread-1 { to { translate: -21% 10%; } }
+@keyframes io-spread-2 { to { translate: 26% 8%; } }
 @keyframes io-fade { to { opacity: 0; } }
 @keyframes io-toss-0 {
   0% { transform: perspective(500px) translate(0, 0) rotateX(0deg) rotateZ(0deg) scale(1, 1); }

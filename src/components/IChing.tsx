@@ -13,28 +13,17 @@ const BOX = { w: 900, h: 740 };
 /** Розмір монетки в цих одиницях (спрайт 327×332). */
 const COIN = { w: 300, ratio: 332 / 327 };
 
-/**
- * Варіанти, як лежать три монетки: x, y — лівий верхній кут, r — нахил у градусах. Монетки, що йдуть далі в списку, лежать зверху.
- * a — трикутник, де монетки трохи накладаються; b — каскад по діагоналі; c — розсип без накладання. Для перегляду: ?io=a, ?io=b, ?io=c.
- */
-const LAYOUTS = {
-  a: [{ x: 300, y: 190, r: -8 }, { x: 70, y: 400, r: 10 }, { x: 500, y: 370, r: 6 }],
-  b: [{ x: 110, y: 210, r: -14 }, { x: 300, y: 300, r: 8 }, { x: 490, y: 390, r: -6 }],
-  c: [{ x: 60, y: 340, r: 14 }, { x: 320, y: 200, r: -10 }, { x: 570, y: 420, r: 22 }],
-} as const;
-
-type LayoutId = keyof typeof LAYOUTS;
-
-const chooseLayout = (): LayoutId => {
-  const forced = new URLSearchParams(location.search).get('io');
-  if (forced === 'a' || forced === 'b' || forced === 'c') return forced;
-  return pick(Object.keys(LAYOUTS) as LayoutId[]);
-};
+/** Як лежать три монетки: трикутник, трохи асиметричний; x, y — лівий верхній кут, r — нахил у градусах. Пізніші лежать зверху. */
+const COINS = [
+  { x: 300, y: 190, r: -8 },
+  { x: 70, y: 400, r: 10 },
+  { x: 500, y: 370, r: 6 },
+] as const;
 
 type Phase = 'ask' | 'toss' | 'done';
 
 /** Скільки триває підкидання, мс; збігається з анімаціями в styles.css. */
-const TOSS_MS = 1500;
+const TOSS_MS = 1700;
 
 /** Шість ліній гексаграми знизу вгору: суцільна — ян, перервана — інь. Лінії з'являються по черзі знизу. */
 function HexagramLines({ lines }: { lines: number[] }) {
@@ -68,8 +57,6 @@ interface Props {
 export function IChingRitual({ onReveal, onClose }: Props) {
   const [phase, setPhase] = useState<Phase>('ask');
   const [hexagram, setHexagram] = useState<Hexagram | null>(null);
-  // Як лягли монетки, вирішується при відкритті: щоразу інакше.
-  const [layout] = useState(chooseLayout);
 
   useEffect(() => {
     if (phase !== 'toss') return;
@@ -84,7 +71,7 @@ export function IChingRitual({ onReveal, onClose }: Props) {
   };
 
   const coinStyle = (i: number): CSSProperties => {
-    const c = LAYOUTS[layout][i];
+    const c = COINS[i];
     return {
       left: `${(c.x / BOX.w) * 100}%`,
       top: `${(c.y / BOX.h) * 100}%`,
@@ -104,7 +91,7 @@ export function IChingRitual({ onReveal, onClose }: Props) {
             {phase !== 'done' && (
               <div className="io-wrap">
                 <div className="cf io" data-phase={phase} style={{ aspectRatio: `${BOX.w} / ${BOX.h}` }}>
-                  {LAYOUTS[layout].map((_, i) => (
+                  {COINS.map((_, i) => (
                     <Sprite key={i} name="i-tsin/flip_a_coin" className={`io-coin c${i}`} style={coinStyle(i)} />
                   ))}
                 </div>
