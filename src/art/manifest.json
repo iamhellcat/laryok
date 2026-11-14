@@ -821,17 +821,31 @@
   },
   "magic_ball/ball_back": {
    "src": "/art/magic_ball/ball_back.webp",
-   "x": 280,
-   "y": 803,
-   "w": 750,
-   "h": 714
+   "x": 298,
+   "y": 828,
+   "w": 716,
+   "h": 686
   },
   "magic_ball/ball_front": {
    "src": "/art/magic_ball/ball_front.webp",
-   "x": 279,
-   "y": 803,
-   "w": 752,
-   "h": 714
+   "x": 297,
+   "y": 823,
+   "w": 720,
+   "h": 686
+  },
+  "magic_ball/dice_roll": {
+   "src": "/art/magic_ball/dice_roll.webp",
+   "x": 527,
+   "y": 1001,
+   "w": 238,
+   "h": 279
+  },
+  "magic_ball/dice_still": {
+   "src": "/art/magic_ball/dice_still.webp",
+   "x": 510,
+   "y": 1053,
+   "w": 287,
+   "h": 235
   },
   "magic_ball/magic_ball_button": {
    "src": "/art/magic_ball/magic_ball_button.webp",

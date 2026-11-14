@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { art } from '../art';
 import { COFFEE_SYMBOLS, TOPIC_INDEX, type CoffeeTopic } from '../data/coffee';
 import type { Character } from '../data/types';
+import { place } from './place';
+import { Sprite } from './Sprite';
 import { CUP, drawCoffee, saveCoffee, symbolScale, todaysCoffee, type CoffeeReading } from '../game/coffee';
 
 /** Як відкрито ворожіння: нове за обраною темою або перечитування сьогоднішнього. */
@@ -32,16 +34,6 @@ const AUTO: Partial<Record<Phase, [number, Phase]>> = {
 };
 
 const pct = (v: number, of: number) => `${(v / of) * 100}%`;
-
-/** Положення спрайта в рамці зі сторонами `box`, коли відомі координати на полотні. */
-function place(a: { x?: number; y?: number; w: number; h: number }, box: { x: number; y: number; w: number; h: number }): CSSProperties {
-  return { left: pct((a.x ?? 0) - box.x, box.w), top: pct((a.y ?? 0) - box.y, box.h), width: pct(a.w, box.w) };
-}
-
-function Sprite({ name, className, style }: { name: string; className?: string; style?: CSSProperties }) {
-  const a = art(name);
-  return <img className={className} src={a.src} width={a.w} height={a.h} alt="" draggable={false} style={style} />;
-}
 
 // ---------- екран 1: пакетик і стаканчик ----------
 

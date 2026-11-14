@@ -2,10 +2,10 @@ import { useState, type ReactNode } from 'react';
 import { art } from '../art';
 import { HEXAGRAMS, type Hexagram } from '../data/iching';
 import { MO_READINGS, MO_SYLLABLES } from '../data/mo';
-import { MAGIC_BALL_ANSWERS } from '../data/oracles';
 import { splitReading, TAROT_CARDS, tarotArtKey, type TarotCard } from '../data/tarot';
 import type { Character, SystemId } from '../data/types';
 import { Astro } from './Astro';
+import { BallRitual } from './Ball';
 import { CoffeeRitual, type CoffeeRun } from './Coffee';
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
@@ -86,39 +86,6 @@ function Tarot({ character, onReveal, onClose }: OracleProps) {
   );
 }
 
-// Синій трикутник на ball_front, у частках від розміру кулі.
-const BALL_TRIANGLE = { left: 33.2, width: 35, top: 35, height: 18 };
-
-/** Короткі відповіді — крупніше, довгі переносяться на два рядки й стають дрібнішими. */
-const answerSize = (answer: string) => (answer.length <= 7 ? '8.4cqw' : answer.length <= 13 ? '5.6cqw' : '4.2cqw');
-
-function Ball({ onReveal, onClose }: OracleProps) {
-  return (
-    <RevealOracle<string>
-      label="Магічна куля"
-      roll={() => pick(MAGIC_BALL_ANSWERS)}
-      onReveal={onReveal}
-      onClose={onClose}
-      back={<div className="ball"><Img name="magic_ball/ball_back" /></div>}
-      result={(answer) => (
-        <div className="ball">
-          <Img name="magic_ball/ball_front" />
-          <span
-            className="ball-answer"
-            style={{ ...pos(BALL_TRIANGLE), fontSize: answerSize(answer) }}
-          >
-            {answer}
-          </span>
-        </div>
-      )}
-    />
-  );
-}
-
-const pos = (r: { left: number; width: number; top: number; height: number }) => ({
-  left: `${r.left}%`, width: `${r.width}%`, top: `${r.top}%`, height: `${r.height}%`,
-});
-
 /** Шість ліній гексаграми знизу вгору: суцільна — ян, перервана — інь. */
 function HexagramLines({ lines }: { lines: number[] }) {
   return (
@@ -183,7 +150,7 @@ function Mo({ onReveal, onClose }: OracleProps) {
 export function Oracle({ system, ...props }: OracleProps & { system: SystemId }) {
   switch (system) {
     case 'tarot': return <Tarot {...props} />;
-    case 'ball': return <Ball {...props} />;
+    case 'ball': return <BallRitual onReveal={props.onReveal} onClose={props.onClose} />;
     case 'coffee': return <CoffeeRitual character={props.character} run={props.coffee ?? { mode: 'new', topic: 'events' }} onReveal={props.onReveal} onClose={props.onClose} />;
     case 'iching': return <IChing {...props} />;
     case 'mo': return <Mo {...props} />;
