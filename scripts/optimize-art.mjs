@@ -181,6 +181,9 @@ const chars = [
   ...Array.from({ length: 0x206f - 0x2010 + 1 }, (_, i) => 0x2010 + i),
   0xa0, 0xab, 0xbb, 0x2116, 0x2605, 0x2606,
 ].map((c) => String.fromCodePoint(c)).join('');
+// Gothic A1 корейський: його «…» (U+2026) стоїть посередині рядка. Без цього гліфа браузер бере трикрапку із системного
+// шрифту (system-ui), де вона, як і належить, на лінії тексту. У Sofia Sans трикрапка нормальна, її лишаємо.
+const gothicChars = chars.replace('\u2026', '');
 mkdirSync('public/fonts', { recursive: true });
 const fonts = {
   'Gothic_A1/GothicA1-Regular.ttf': 'GothicA1-Regular.woff2',
@@ -188,7 +191,7 @@ const fonts = {
   'Sofia_Sans_Extra_Condensed/SofiaSansExtraCondensed-VariableFont_wght.ttf': 'SofiaSansExtraCondensed.woff2',
 };
 for (const [from, to] of Object.entries(fonts)) {
-  const out = await subsetFont(readFileSync(`Fonts/${from}`), chars, { targetFormat: 'woff2' });
+  const out = await subsetFont(readFileSync(`Fonts/${from}`), from.startsWith('Gothic') ? gothicChars : chars, { targetFormat: 'woff2' });
   writeFileSync(`public/fonts/${to}`, out);
 }
 console.log(`Готово: ${files.length} зображень`);
