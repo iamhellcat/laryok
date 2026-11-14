@@ -37,8 +37,15 @@ export interface AnswerLayout {
 const MIN_SIZE = 26;
 const MAX_SIZE = 80;
 const BOTTOM = 1192;
-/** Відступ від краю трикутника з кожного боку. */
-const PAD = 12;
+/** Висота (центр рядка), нижче якої один короткий рядок не опускаємо. Трикутник вужчий донизу, тому центр трохи нижче найширшого місця. */
+const SINGLE_CENTER_LOW = 1116;
+const SINGLE_CENTER_HIGH = 1100;
+/** Перший рядок кількох: чим нижче, тим більше повітря від верхнього краю, але вужче місце. */
+const MULTI_TOP_LOW = 1074;
+const MULTI_TOP_HIGH = 1062;
+
+/** Відступ від краю трикутника з кожного боку: росте разом із шрифтом, щоб великі літери не впиралися в рамку. */
+const padFor = (size: number) => 12 + 0.2 * size;
 
 /** Усі розбиття слів на `n` підряд ідучих груп. */
 function splits(words: string[], n: number): string[][] {
@@ -58,19 +65,24 @@ export function fitAnswer(text: string, measure: (s: string) => number): AnswerL
   const words = text.trim().split(/\s+/);
   let fallback: AnswerLayout | null = null;
   for (let size = MAX_SIZE; size >= MIN_SIZE; size--) {
+    const pad = padFor(size);
     for (let n = 1; n <= Math.min(words.length, 4); n++) {
-      // Один рядок стоїть по центру широкої частини, кілька — від верху.
-      const top = n === 1 ? 1094 - size / 2 : 1064;
-      if (top + n * size > BOTTOM) continue;
-      let best: { lines: string[]; slack: number } | null = null;
-      for (const lines of splits(words, n)) {
-        // Запас у пікселях між рядком і краєм трикутника на нижній межі рядка (там він найвужчий).
-        const slack = Math.min(...lines.map((line, k) => triangleWidth(top + (k + 0.9) * size) - 2 * PAD - measure(line) * size));
-        if (slack >= 0 && (!best || slack > best.slack)) best = { lines, slack };
+      // Один рядок: найнижче положення, де він ще вміщається (по центру трикутника). Кілька рядків: від верху з відступом.
+      const tops: number[] = [];
+      if (n === 1) for (let c = SINGLE_CENTER_LOW; c >= SINGLE_CENTER_HIGH; c -= 2) tops.push(c - size / 2);
+      else for (let t = MULTI_TOP_LOW; t >= MULTI_TOP_HIGH; t -= 2) tops.push(t);
+      for (const top of tops) {
+        if (top + n * size > BOTTOM) continue;
+        let best: { lines: string[]; slack: number } | null = null;
+        for (const lines of splits(words, n)) {
+          // Запас у пікселях між рядком і краєм трикутника на нижній межі рядка (там він найвужчий).
+          const slack = Math.min(...lines.map((line, k) => triangleWidth(top + (k + 0.9) * size) - 2 * pad - measure(line) * size));
+          if (slack >= 0 && (!best || slack > best.slack)) best = { lines, slack };
+        }
+        if (best) return { lines: best.lines, size, top };
       }
-      if (best) return { lines: best.lines, size, top };
-      if (size === MIN_SIZE && n === Math.min(words.length, 4)) fallback = { lines: splits(words, n)[0], size, top };
+      if (size === MIN_SIZE && n === Math.min(words.length, 4)) fallback = { lines: splits(words, n)[0], size, top: MULTI_TOP_HIGH };
     }
   }
-  return fallback ?? { lines: [text], size: MIN_SIZE, top: 1064 };
+  return fallback ?? { lines: [text], size: MIN_SIZE, top: MULTI_TOP_HIGH };
 }
