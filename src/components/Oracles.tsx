@@ -1,11 +1,11 @@
 import { useState, type ReactNode } from 'react';
 import { art } from '../art';
-import { HEXAGRAMS, type Hexagram } from '../data/iching';
 import { splitReading, TAROT_CARDS, tarotArtKey, type TarotCard } from '../data/tarot';
 import type { Character, SystemId } from '../data/types';
 import { Astro } from './Astro';
 import { BallRitual } from './Ball';
 import { CoffeeRitual, type CoffeeRun } from './Coffee';
+import { IChingRitual } from './IChing';
 import { MoRitual } from './Mo';
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
@@ -86,51 +86,12 @@ function Tarot({ character, onReveal, onClose }: OracleProps) {
   );
 }
 
-/** Шість ліній гексаграми знизу вгору: суцільна — ян, перервана — інь. */
-function HexagramLines({ lines }: { lines: number[] }) {
-  return (
-    <svg className="hexagram" viewBox="0 0 100 88" role="img" aria-label="Гексаграма">
-      {[...lines].reverse().map((yang, i) => (
-        <g key={i} transform={`translate(0 ${i * 15.2})`}>
-          {yang ? (
-            <rect width="100" height="10" rx="3" />
-          ) : (
-            <>
-              <rect width="42" height="10" rx="3" />
-              <rect x="58" width="42" height="10" rx="3" />
-            </>
-          )}
-        </g>
-      ))}
-    </svg>
-  );
-}
-
-function IChing({ onReveal, onClose }: OracleProps) {
-  return (
-    <RevealOracle<Hexagram>
-      label="І-Цзин"
-      roll={() => pick(HEXAGRAMS)}
-      onReveal={onReveal}
-      onClose={onClose}
-      back={<Img name="i-tsin/flip_a_coin" className="coin" />}
-      result={(h) => (
-        <>
-          <HexagramLines lines={h.lines} />
-          <h2 className="result-title">№ {h.n} · {h.name}</h2>
-          <p className="result-text">{h.text}</p>
-        </>
-      )}
-    />
-  );
-}
-
 export function Oracle({ system, ...props }: OracleProps & { system: SystemId }) {
   switch (system) {
     case 'tarot': return <Tarot {...props} />;
     case 'ball': return <BallRitual onReveal={props.onReveal} onClose={props.onClose} />;
     case 'coffee': return <CoffeeRitual character={props.character} run={props.coffee ?? { mode: 'new', topic: 'events' }} onReveal={props.onReveal} onClose={props.onClose} />;
-    case 'iching': return <IChing {...props} />;
+    case 'iching': return <IChingRitual onReveal={props.onReveal} onClose={props.onClose} />;
     case 'mo': return <MoRitual onReveal={props.onReveal} onClose={props.onClose} />;
     case 'astro': return <Astro onClose={props.onClose} />;
     default: return null;
