@@ -1,7 +1,9 @@
 import { Body, EclipticGeoMoon, Ecliptic, GeoVector, MoonPhase, Observer, SearchMoonPhase, SearchRiseSet, SunPosition } from 'astronomy-engine';
 import {
-  LUNAR_DAYS, MOON_IN_SIGN, MOON_SIGN_THESIS, PHASE_THESIS, PLANET_NAMES, RETROGRADE, SIGN_NAMES, SUN_IN_SIGN, SUN_SIGN_THESIS,
+  ASPECT_ORBS, LUNAR_DAYS, MOON_IN_SIGN, MOON_SIGN_THESIS, PHASE_THESIS, PLANET_GENITIVE, PLANET_NAMES, RETROGRADE, SIGN_NAMES,
+  SUN_IN_SIGN, SUN_SIGN_THESIS,
 } from '../data/astro';
+import { ASPECT_TEXT, type AspectKind } from '../data/aspects';
 
 // Місячну добу рахуємо за сходом Місяця в Києві.
 const KYIV = new Observer(50.4501, 30.5234, 180);
@@ -53,6 +55,17 @@ export interface ExitingPlanet extends Station {
   text: string;
 }
 
+/** Аспект між двома тілами, наявний цього дня. */
+export interface AspectToday {
+  kind: AspectKind;
+  /** Назви планет у називному й родовому відмінках. */
+  names: [string, string];
+  genitive: [string, string];
+  text: string;
+  /** Момент, коли аспект стає точним, якщо це відбувається протягом доби. */
+  exact: Date | null;
+}
+
 export interface AstroReport {
   /** Момент, для якого складено випуск. */
   today: Date;
@@ -73,6 +86,8 @@ export interface AstroReport {
   exiting: ExitingPlanet[];
   /** Планети, що саме сьогодні входять у ретроградність. */
   entering: Station[];
+  /** Квадратури, опозиції й з'єднання, наявні сьогодні. */
+  aspects: AspectToday[];
   /** Підсумок дня: три короткі тези (фаза Місяця, Сонце в знаку, Місяць у знаку). */
   theses: { label: string; text: string }[];
 }
@@ -228,6 +243,49 @@ export function computeAstro(now: Date = new Date()): AstroReport {
   exiting.sort((a, b) => a.time.getTime() - b.time.getTime());
   entering.sort((a, b) => a.time.getTime() - b.time.getTime());
 
+  // Аспекти доби: квадратура (90° з будь-якого боку), опозиція (180°), з'єднання (0°).
+  const ASPECT_TARGETS: { kind: AspectKind; targets: number[] }[] = [
+    { kind: 'square', targets: [90, 270] },
+    { kind: 'opposition', targets: [180] },
+    { kind: 'conjunction', targets: [0] },
+  ];
+  const aspects: AspectToday[] = [];
+  for (const { kind, targets } of ASPECT_TARGETS) {
+    for (let i = 0; i < BODIES.length; i++) {
+      for (let j = i + 1; j < BODIES.length; j++) {
+        const orb = i === 1 || j === 1 ? ASPECT_ORBS.moon : ASPECT_ORBS.other;
+        // Відхилення від точного аспекту в кожну годину доби; точний момент — там, де воно проходить через нуль.
+        const dev = samples.map((s) => {
+          const sep = norm360(s.lon[j] - s.lon[i]);
+          return targets.map((t) => norm180(sep - t));
+        });
+        let best = Infinity;
+        let exact: Date | null = null;
+        for (let k = 0; k <= 24; k++) {
+          for (let ti = 0; ti < targets.length; ti++) {
+            const d1 = dev[k][ti];
+            best = Math.min(best, Math.abs(d1));
+            if (k === 24) continue;
+            const d2 = dev[k + 1][ti];
+            if (d1 * d2 < 0 && Math.abs(d1) < 30 && Math.abs(d2) < 30) {
+              exact = new Date(samples[k].t.getTime() + HOUR * (d1 / (d1 - d2)));
+            }
+          }
+        }
+        if (best > orb) continue;
+        const a = BODIES[i];
+        const b = BODIES[j];
+        aspects.push({
+          kind,
+          names: [PLANET_NAMES[a], PLANET_NAMES[b]],
+          genitive: [PLANET_GENITIVE[a], PLANET_GENITIVE[b]],
+          text: ASPECT_TEXT[`${kind}:${a}-${b}`],
+          exact,
+        });
+      }
+    }
+  }
+
   const sunIndex = signIndex(longitude(Body.Sun, now));
   const moonIndex = signIndex(longitude(Body.Moon, now));
   // «Місяць у Леві», «Сонце в Скорпіоні»: заголовок береться з тексту з документа.
@@ -246,6 +304,7 @@ export function computeAstro(now: Date = new Date()): AstroReport {
     retrograde,
     exiting,
     entering,
+    aspects,
     theses: [
       { label: phase.name, text: PHASE_THESIS[phase.name] },
       { label: headOf(SUN_IN_SIGN[sunIndex]), text: SUN_SIGN_THESIS[sunIndex] },

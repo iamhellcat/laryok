@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { computeAstro, type MoonPhaseInfo } from '../game/astro';
+import { ASPECT_NAMES } from '../data/astro';
+import { computeAstro, type AspectToday, type MoonPhaseInfo } from '../game/astro';
 
 /** Ділить текст на заголовок (перше речення без крапки) і решту. */
 function splitHead(text: string) {
@@ -14,6 +15,29 @@ function when(d: Date, today: Date) {
 }
 
 const clock = (d: Date) => d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+
+const VOWELS = 'аеєиіїоуюяАЕЄИІЇОУЮЯ';
+
+/** «Сонце й Місяць», «Місяць і Венера»: «й» після голосної, «і» після приголосної. */
+const andJoin = (a: string, b: string) => `${a} ${VOWELS.includes(a.slice(-1)) ? 'й' : 'і'} ${b}`;
+
+/** «А, Б та В». */
+function listJoin(items: string[]) {
+  return items.length < 2 ? (items[0] ?? '') : `${items.slice(0, -1).join(', ')} та ${items[items.length - 1]}`;
+}
+
+/** Рядок зверху блоку: «Сьогодні наявні: квадратури Місяця й Венери та …; з’єднання Марса й Юпітера.» */
+function aspectLine(aspects: AspectToday[]) {
+  const parts = (['square', 'opposition', 'conjunction'] as const)
+    .map((kind) => {
+      const list = aspects.filter((a) => a.kind === kind);
+      if (list.length === 0) return '';
+      const name = list.length === 1 ? ASPECT_NAMES[kind].one : ASPECT_NAMES[kind].many;
+      return `${name} ${listJoin(list.map((a) => andJoin(a.genitive[0], a.genitive[1])))}`;
+    })
+    .filter(Boolean);
+  return `Сьогодні наявні: ${parts.join('; ')}.`;
+}
 
 /** Фаза Місяця: освітлена частина малюється з кута Сонце–Місяць (на північній півкулі зростаючий світиться справа). */
 function MoonIcon({ phase }: { phase: MoonPhaseInfo }) {
@@ -33,6 +57,7 @@ function MoonIcon({ phase }: { phase: MoonPhaseInfo }) {
 export function Astro({ onClose }: { onClose: () => void }) {
   const r = useMemo(() => computeAstro(), []);
   const [moreRetro, setMoreRetro] = useState(false);
+  const [moreAspects, setMoreAspects] = useState(false);
   const percent = Math.round(r.phase.illumination * 100);
   const moonSign = splitHead(r.moonSign);
   const sunSign = splitHead(r.sunSign);
@@ -80,6 +105,25 @@ export function Astro({ onClose }: { onClose: () => void }) {
               <p className="note">О {clock(r.sunIngress.time)} Сонце переходить у знак «{r.sunIngress.sign}».</p>
             )}
           </section>
+
+          {r.aspects.length > 0 && (
+            <section>
+              <h3>Планетарні аспекти</h3>
+              <p className="paper-text">{aspectLine(r.aspects)}</p>
+              <button className="reply more" aria-expanded={moreAspects} onClick={() => setMoreAspects(!moreAspects)}>
+                {moreAspects ? 'Сховати' : 'Детальніше'}
+              </button>
+              {moreAspects &&
+                r.aspects.map((a) => (
+                  <div className="retro-detail" key={`${a.kind}-${a.names.join()}`}>
+                    <p className="paper-text">
+                      <b>{ASPECT_NAMES[a.kind].head}: {andJoin(a.names[0], a.names[1])}.</b> {a.text}
+                    </p>
+                    {a.exact && <p className="note">Точний о {clock(a.exact)}.</p>}
+                  </div>
+                ))}
+            </section>
+          )}
 
           {(r.retrograde.length > 0 || r.exiting.length > 0 || r.entering.length > 0) && (
             <section>
